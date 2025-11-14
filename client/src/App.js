@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import SleepTracker from "./components/sleepTracker";
-
+import SleepChart from "./components/sleepChart";
+import MoodInput from "./components/MoodInput";
 
 function App() {
   const [habits, setHabits] = useState([]);
@@ -44,7 +45,7 @@ function App() {
   return (
     <div style={{ maxWidth: "400px", margin: "40px auto", textAlign: "center" }}>
 
-      {/* Habit Tracker Section */}
+      {/* Habit Tracker Section
       <h1>My Habits</h1>
       <div>
         <input
@@ -68,11 +69,17 @@ function App() {
             </button>
           </li>
         ))}
-      </ul>
+      </ul> */}
 
 
       {/*Sleep Tracker  */}
       <SleepTracker />
+
+      {/* SleepChart */}
+      <SleepChart />
+      
+      {/* MoodInput */}
+      <MoodInput />
     </div>
   );
 }

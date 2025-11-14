@@ -23,8 +23,9 @@ function SleepTracker() {
 
     try {
       await axios.post(`http://localhost:5000/api/sleep`, {
-        sleepTime: sleepDateTime,
-        wakeTime: wakeDateTime,
+        date,
+        sleepTime,
+        wakeTime,
       });
       alert("Sleep data saved!");
     } catch (error) {

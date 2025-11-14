@@ -26,7 +26,7 @@ function MoodInput() {
   return (
     <div style={{ marginTop: "20px" }}>
       <h3>Mood Gauge</h3>
-
+        
       <label>Date:</label>
       <input
         type="date"

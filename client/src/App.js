@@ -3,6 +3,7 @@ import axios from "axios";
 import SleepTracker from "./components/sleepTracker";
 import SleepChart from "./components/sleepChart";
 import MoodInput from "./components/MoodInput";
+import Header from "./components/Header";
 
 function App() {
   const [habits, setHabits] = useState([]);
@@ -43,44 +44,63 @@ function App() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "40px auto", textAlign: "center" }}>
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed pt-20"
+      style={{ backgroundImage: "url('/star-bg.jpg')" }}
+    >
+      <Header />
 
-      {/* Habit Tracker Section
-      <h1>My Habits</h1>
-      <div>
-        <input
-          type="text"
-          placeholder="New habit..."
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <button onClick={addHabit}>Add</button>
+      <div className="max-w-[1500px] mx-auto flex gap-10 p-10">
+        {/* LEFT SIDE */}
+        <div className="w-[340px] flex flex-col gap-8">
+          <SleepTracker />
+          <MoodInput />
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div className="flex-1">
+          <SleepChart />
+        </div>
       </div>
-
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {habits.map((habit) => (
-          <li key={habit._id} style={{ margin: "10px 0" }}>
-            <b>{habit.title}</b> — {habit.streak} days
-            <button
-              onClick={() => incrementStreak(habit._id)}
-              style={{ marginLeft: "10px" }}
-            >
-              +1
-            </button>
-          </li>
-        ))}
-      </ul> */}
-
-
-      {/*Sleep Tracker  */}
-      <SleepTracker />
-
-      {/* SleepChart */}
-      <SleepChart />
-      
-      {/* MoodInput */}
-      <MoodInput />
     </div>
+    // <div style={{ maxWidth: "400px", margin: "40px auto", textAlign: "center" }}>
+
+    //   {/* Habit Tracker Section
+    //   <h1>My Habits</h1>
+    //   <div>
+    //     <input
+    //       type="text"
+    //       placeholder="New habit..."
+    //       value={title}
+    //       onChange={(e) => setTitle(e.target.value)}
+    //     />
+    //     <button onClick={addHabit}>Add</button>
+    //   </div>
+
+    //   <ul style={{ listStyle: "none", padding: 0 }}>
+    //     {habits.map((habit) => (
+    //       <li key={habit._id} style={{ margin: "10px 0" }}>
+    //         <b>{habit.title}</b> — {habit.streak} days
+    //         <button
+    //           onClick={() => incrementStreak(habit._id)}
+    //           style={{ marginLeft: "10px" }}
+    //         >
+    //           +1
+    //         </button>
+    //       </li>
+    //     ))}
+    //   </ul> */}
+
+
+    //   {/*Sleep Tracker  */}
+    //   <SleepTracker />
+
+    //   {/* SleepChart */}
+    //   <SleepChart />
+      
+    //   {/* MoodInput */}
+    //   <MoodInput />
+    // </div>
   );
 }
 

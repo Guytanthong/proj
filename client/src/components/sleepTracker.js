@@ -35,40 +35,40 @@ function SleepTracker() {
   };
 
   return (
-    <div style={{ marginTop: "20px" }}>
-      <h3>Sleep Tracker</h3>
+    <div className="bg-gradient-to-br from-orange-600 to-yellow-700 p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.5)] text-white">
+      <h2 className="text-2xl font-bold mb-4">Add ur SLEEP <span className="text-sm opacity-80">when u wake</span></h2>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>Date:</label>
-        <br />
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-      </div>
+          {/* date */}
+      <label className="text-sm opacity-80">DATE</label>
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        className="w-full mt-1 mb-3 bg-white/20 p-2 rounded-lg text-white"
+      />
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>Sleep Time:</label>
-        <br />
-        <input
-          type="time"
-          value={sleepTime}
-          onChange={(e) => setSleepTime(e.target.value)}
-        />
-      </div>
+      {/* sleep */}
+      <label className="text-sm opacity-80">SLEEP</label>
+      <input
+        type="time"
+        className="w-full mt-1 mb-3 bg-white/20 p-2 rounded-lg text-white"
+        value={sleepTime}
+        onChange={(e) => setSleepTime(e.target.value)}
+      />
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>Wake Time:</label>
-        <br />
-        <input
-          type="time"
-          value={wakeTime}
-          onChange={(e) => setWakeTime(e.target.value)}
-        />
-      </div>
+      {/* wake */}
+      <label className="text-sm opacity-80">WAKE</label>
+      <input
+        type="time"
+        className="w-full mt-1 mb-4 bg-white/20 p-2 rounded-lg text-white"
+        value={wakeTime}
+        onChange={(e) => setWakeTime(e.target.value)}
+      />
 
-      <button onClick={handleSubmit}>Save</button>
+      <button onClick={handleSubmit}
+            className="mt-2 w-full bg-white/30 hover:bg-white/40 p-2 rounded-lg font-semibold">
+        Save
+      </button>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 const habitRoutes = require('./routes/habitRoutes');
 const sleepRoutes = require("./routes/sleepRoutes");
 const moodRoutes = require("./routes/moodRoutes");
+const activityRoutes = require("./routes/activityRoutes");
 
 const express = require('express');
 const cors = require('cors');
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
 app.use('/api/habits', habitRoutes);
 app.use("/api/sleep", sleepRoutes);
 app.use("/api/mood", moodRoutes);
+app.use("/api/activity", activityRoutes);
 
 const PORT = process.env.PORT || 5000;
 

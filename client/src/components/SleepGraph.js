@@ -34,7 +34,7 @@ function moodColor(mood) {
   return "#9ca3af";
 }
 
-export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRange,  rangePreset }) {
+export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRange}) {
   const chartRef = useRef(null);
 
   // Build mood map (shift mood to previous day)
@@ -76,8 +76,8 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRa
         backgroundColor: formatted.map((d) => moodColor(d.mood)),
         borderRadius: 6,
 
-        // ⭐ NEW — make bars align with day column
-        barThickness: 20,
+        // make bars align with day column
+        barThickness: 'flex',
         maxBarThickness: 20,
         categoryPercentage: 1.0,
         barPercentage: 1.0,
@@ -97,6 +97,7 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRa
             round: "day",
           },
           offset: true,     // centers bars inside date block
+          grouped: false,
           min: sharedRange?.min ?? undefined,
           max: sharedRange?.max ?? undefined,
         },

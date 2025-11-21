@@ -55,12 +55,17 @@ export default function ActivityGraph({ activityData, sharedRange }) {
         type: "bar",
         label: "Activity",
         data: formatted.map(a => ({
-        x: a.x,
-        y: [a.startHour, a.endHour]
+          x: a.x,
+          y: [a.startHour, a.endHour]
         })),
         backgroundColor: formatted.map(a => a.color),
         borderRadius: 4,
-        barPercentage: 0.9
+
+        // ⭐ NEW
+        barThickness: 20,
+        maxBarThickness: 20,
+        categoryPercentage: 1.0,
+        barPercentage: 1.0,
       }
     ]
   };
@@ -71,13 +76,15 @@ export default function ActivityGraph({ activityData, sharedRange }) {
 
     scales: {
       x: {
-        type: "time",
-        time: { unit: "day" },
-
-        // ⭐ IMPORTANT: use exact values or undefined (NOT null)
-        min: sharedRange ? sharedRange.min : undefined,
-        max: sharedRange ? sharedRange.max : undefined,
-      },
+          type: "time",
+          time: {
+            unit: "day",
+            round: "day",
+          },
+          offset: true,   // ⭐ NEW
+          min: sharedRange ? sharedRange.min : undefined,
+          max: sharedRange ? sharedRange.max : undefined,
+        },
       y: {
         reverse: true,
         min: 18,
@@ -91,7 +98,7 @@ export default function ActivityGraph({ activityData, sharedRange }) {
             }
         },
 
-        // ⭐ SAME TICK FIX AS SleepGraph
+        // SAME TICK FIX AS SleepGraph
         afterBuildTicks: (scale) => {
             const ticks = [];
             for (let v = 15; v <= 42; v += 3) {
@@ -105,7 +112,7 @@ export default function ActivityGraph({ activityData, sharedRange }) {
 
   return (
     <div className="w-full h-[250px] bg-white p-4 rounded-xl shadow-lg mt-5">
-      {/* ⭐ FORCE rerender when sharedRange updates */}
+      {/* FORCE rerender when sharedRange updates */}
       <Chart
         key={(sharedRange?.min || 0) + "-" + (sharedRange?.max || 0)}
         type="bar"

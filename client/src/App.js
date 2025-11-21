@@ -11,6 +11,7 @@ function App() {
   const [sleepData, setSleepData] = useState([]);
   const [moodData, setMoodData] = useState([]);
   const [activityData, setActivityData] = useState([]);
+  const [rangePreset, setRangePreset] = useState(null);
   
 
   // NEW: Shared date range for both graphs
@@ -22,6 +23,39 @@ function App() {
     axios.get("http://localhost:5000/api/activity/all").then(res => setActivityData(res.data));
   }, []);
 
+
+  // NEW: Auto-adjust X-axis when preset changes
+  useEffect(() => {
+    if (!rangePreset || sleepData.length === 0) return;
+
+    const allDates = sleepData.map(d => new Date(d.date).getTime());
+    const maxDate = Math.max(...allDates);
+    let min, max;
+
+    switch (rangePreset) {
+      case "1W":
+        min = maxDate - 7 * 24 * 60 * 60 * 1000;
+        break;
+      case "1M":
+        min = maxDate - 30 * 24 * 60 * 60 * 1000;
+        break;
+      case "3M":
+        min = maxDate - 90 * 24 * 60 * 60 * 1000;
+        break;
+      case "6M":
+        min = maxDate - 180 * 24 * 60 * 60 * 1000;
+        break;
+      case "1Y":
+        min = maxDate - 365 * 24 * 60 * 60 * 1000;
+        break;
+      case "RESET":
+        setSharedRange(null);
+        return;
+    }
+
+    max = maxDate;
+    setSharedRange({ min, max });
+  }, [rangePreset, sleepData]);
   return (
     <div className="min-h-screen bg-cover bg-center bg-fixed pt-20"
       style={{ backgroundImage: "url('/star-bg.jpg')" }}>
@@ -39,16 +73,32 @@ function App() {
         {/* RIGHT SIDE */}
         <div className="flex-1">
 
-          <SleepGraph
-            sleepData={sleepData}
-            moodData={moodData}
-            onRangeChange={setSharedRange}
-          />
+        <div className="flex gap-2 mb-4">
+          {["1W", "1M", "3M", "6M", "1Y", "RESET"].map(preset => (
+            <button
+              key={preset}
+              onClick={() => setRangePreset(preset)}
+              className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white rounded"
+            >
+              {preset}
+            </button>
+          ))}
+        </div>
 
-          <ActivityGraph
-            activityData={activityData}
-            sharedRange={sharedRange}
-          />
+        
+        
+        <SleepGraph
+          sleepData={sleepData}
+          moodData={moodData}
+          onRangeChange={setSharedRange}
+          sharedRange={sharedRange} 
+          
+        />
+
+        <ActivityGraph
+          activityData={activityData}
+          sharedRange={sharedRange}
+        />
 
         </div>
       </div>

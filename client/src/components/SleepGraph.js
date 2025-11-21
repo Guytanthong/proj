@@ -34,7 +34,7 @@ function moodColor(mood) {
   return "#9ca3af";
 }
 
-export default function SleepGraph({ sleepData, moodData, onRangeChange }) {
+export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRange,  rangePreset }) {
   const chartRef = useRef(null);
 
   // Build mood map (shift mood to previous day)
@@ -70,12 +70,17 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange }) {
         type: "bar",
         label: "Sleep",
         data: formatted.map((d) => ({
-          x: new Date(d.date).getTime(), 
+          x: new Date(d.date).getTime(),
           y: [d.startHour, d.endHour],
         })),
         backgroundColor: formatted.map((d) => moodColor(d.mood)),
         borderRadius: 6,
-        barPercentage: 0.6
+
+        // ⭐ NEW — make bars align with day column
+        barThickness: 20,
+        maxBarThickness: 20,
+        categoryPercentage: 1.0,
+        barPercentage: 1.0,
       }
     ]
   };
@@ -86,14 +91,20 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange }) {
 
     scales: {
       x: {
-        type: "time",
-        time: { unit: "day" },
-      },
+          type: "time",
+          time: {
+            unit: "day",
+            round: "day",
+          },
+          offset: true,     // centers bars inside date block
+          min: sharedRange?.min ?? undefined,
+          max: sharedRange?.max ?? undefined,
+        },
       y: {
         type: "linear",
         reverse: true,
-        min: 18,
-        max: 39,
+        min: Math.min(...formatted.map(d => d.startHour)) - 1,
+        max: Math.max(...formatted.map(d => d.endHour)) + 1,
         ticks: {
           stepSize: 3,
           callback: (v) => {
@@ -112,6 +123,37 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange }) {
     },
 
     plugins: {
+
+      tooltip: {
+        callbacks: {
+
+          title: (context) => {
+            const date = new Date(context[0].raw.x);
+            return date.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric"
+            });
+          },
+
+          label: (context) => {
+            const [rawStart, rawEnd] = context.raw.y;
+
+            // Convert fractional hour → hh:mm
+            const toTime = (v) => {
+              let h = Math.floor(v);
+              let m = Math.round((v - h) * 60);
+
+              // wrap after 24h
+              if (h >= 24) h -= 24;
+
+              return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+            };
+
+            return `Sleep: ${toTime(rawStart)} → ${toTime(rawEnd)}`;
+          }
+        }
+      },
       zoom: {
         zoom: {
           wheel: { enabled: true },

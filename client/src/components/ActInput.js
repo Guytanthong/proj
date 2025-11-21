@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import CustomTimePicker from "./CustomTimePicker";
+import CustomTimePicker from "./TimeInput24";
 
 
 export default function ActInput() {

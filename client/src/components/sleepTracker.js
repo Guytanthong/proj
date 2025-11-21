@@ -1,17 +1,16 @@
 import { useState } from "react";
 import axios from "axios";
-import CustomTimePicker from "./CustomTimePicker";
 
 function SleepTracker() {
   const [date, setDate] = useState("");
-  const [sleepTime, setSleepTime] = useState(null);
-  const [wakeTime, setWakeTime] = useState(null);
+  const [sleepTime, setSleepTime] = useState("");   // now a string "HH:mm"
+  const [wakeTime, setWakeTime] = useState("");     // string "HH:mm"
 
-  // Convert picker object → "HH:mm"
-  function to24h({ hour, minute, ampm }) {
-    let h = hour % 12;
-    if (ampm === "PM") h += 12;
-    return `${String(h).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  // Ensure "H:M" → "HH:MM"
+  function formatTime(str) {
+    if (!str) return "";
+    const [h, m] = str.split(":").map(Number);
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
   }
 
   const handleSubmit = async () => {
@@ -20,14 +19,13 @@ function SleepTracker() {
       return;
     }
 
-    // Convert picker values to time strings
-    const sleepString = to24h(sleepTime);
-    const wakeString = to24h(wakeTime);
+    const sleepString = formatTime(sleepTime);
+    const wakeString = formatTime(wakeTime);
 
-    // Build Date objects
     const sleepDateTime = new Date(`${date}T${sleepString}`);
     let wakeDateTime = new Date(`${date}T${wakeString}`);
 
+    // If waking is earlier → next day
     if (wakeDateTime < sleepDateTime) {
       wakeDateTime.setDate(wakeDateTime.getDate() + 1);
     }
@@ -36,7 +34,7 @@ function SleepTracker() {
       await axios.post("http://localhost:5000/api/sleep", {
         date,
         sleepTime: sleepString,
-        wakeTime: wakeString,
+        wakeTime: wakeString
       });
 
       alert("Sleep data saved!");
@@ -47,13 +45,13 @@ function SleepTracker() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-orange-600 to-yellow-700 p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.5)] text-white">
+    <div className="bg-gradient-to-br from-orange-600 to-yellow-700 p-6 rounded-2xl shadow-lg text-white">
 
       <h2 className="text-2xl font-bold mb-4">
-        Add ur SLEEP <span className="text-sm opacity-80">when u wake</span>
+        Add your SLEEP <span className="text-sm opacity-80">when u wake</span>
       </h2>
 
-      {/* Date */}
+      {/* DATE */}
       <label className="text-sm opacity-80">DATE</label>
       <input
         type="date"
@@ -62,20 +60,22 @@ function SleepTracker() {
         className="w-full mt-1 mb-3 bg-white/20 p-2 rounded-lg text-white"
       />
 
-      {/* Sleep Time Picker */}
-      <label className="text-sm opacity-80">SLEEP</label>
-      <CustomTimePicker
-        label="Sleep Time"
+      {/* Sleep Time */}
+      <label className="text-sm opacity-80">Sleep Time</label>
+      <input
+        type="time"
         value={sleepTime}
-        onChange={(val) => setSleepTime(val)}
+        onChange={(e) => setSleepTime(e.target.value)}
+        className="w-full mt-1 mb-3 bg-white/20 p-2 rounded-lg text-white"
       />
 
-      {/* Wake Time Picker */}
-      <label className="text-sm opacity-80 mt-2">WAKE</label>
-      <CustomTimePicker
-        label="Wake Time"
+      {/* Wake Time */}
+      <label className="text-sm opacity-80">Wake Time</label>
+      <input
+        type="time"
         value={wakeTime}
-        onChange={(val) => setWakeTime(val)}
+        onChange={(e) => setWakeTime(e.target.value)}
+        className="w-full mt-1 mb-3 bg-white/20 p-2 rounded-lg text-white"
       />
 
       <button

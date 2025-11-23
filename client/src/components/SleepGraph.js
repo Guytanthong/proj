@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import  { useRef } from "react";
 import {
   Chart as ChartJS,
   BarElement,
@@ -22,8 +22,8 @@ ChartJS.register(
 );
 
 // Convert "HH:MM" → hours float
-function toHour(timeStr) {
-  const [h, m] = timeStr.split(":").map(Number);
+function toHour(str) {
+  const [h, m] = str.split(":").map(Number);
   return h + m / 60;
 }
 
@@ -34,21 +34,23 @@ function moodColor(mood) {
   return "#9ca3af";
 }
 
-export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRange}) {
+export default function SleepGraph({ sleepData, moodData, onRangeChange, sharedRange }) {
   const chartRef = useRef(null);
 
-  // Build mood map (shift mood to previous day)
+  // Mood one-day shift
   const moodMap = {};
   moodData.forEach((m) => {
     const d = new Date(m.date);
     d.setDate(d.getDate() - 1);
-    const k = d.toISOString().split("T")[0];
-    moodMap[k] = m.mood;
+    moodMap[d.toISOString().split("T")[0]] = m.mood;
   });
 
-  // Format sleep data
+  // Sleep format
   const formatted = sleepData.map((entry) => {
-    const day = entry.date.split("T")[0];
+    const iso = entry.date.split("T")[0];
+
+    const ts = new Date(iso + "T00:00:00Z").getTime();  // ⭐ SAME AS ActivityGraph & presets
+
     let start = toHour(entry.sleepTime);
     let end = toHour(entry.wakeTime);
 
@@ -57,10 +59,11 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRa
     if (end < 15) end += 24;
 
     return {
-      date: day,
+      iso,
+      ts,
       startHour: start,
       endHour: end,
-      mood: moodMap[day] || "NONE"
+      mood: moodMap[iso] || "NONE"
     };
   });
 
@@ -69,18 +72,14 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRa
       {
         type: "bar",
         label: "Sleep",
-        data: formatted.map((d) => ({
-          x: new Date(d.date).getTime(),
-          y: [d.startHour, d.endHour],
+        data: formatted.map((d, i) => ({
+          x: d.ts + i * 60000,   // add 1 minute spacing per bar
+          y: [d.startHour, d.endHour]
         })),
         backgroundColor: formatted.map((d) => moodColor(d.mood)),
         borderRadius: 6,
-
-        // make bars align with day column
-        barThickness: 'flex',
+        barThickness: 20,
         maxBarThickness: 20,
-        categoryPercentage: 1.0,
-        barPercentage: 1.0,
       }
     ]
   };
@@ -91,21 +90,21 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRa
 
     scales: {
       x: {
-          type: "time",
-          time: {
-            unit: "day",
-            round: "day",
-          },
-          offset: true,     // centers bars inside date block
-          grouped: false,
-          min: sharedRange?.min ?? undefined,
-          max: sharedRange?.max ?? undefined,
+        type: "time",
+        time: {
+          unit: "day",
+          tooltipFormat: "dd MMM yyyy"
         },
+        min: sharedRange?.min,
+        max: sharedRange?.max,
+        offset: true,
+      },
+
       y: {
-        type: "linear",
         reverse: true,
         min: Math.min(...formatted.map(d => d.startHour)) - 1,
         max: Math.max(...formatted.map(d => d.endHour)) + 1,
+
         ticks: {
           stepSize: 3,
           callback: (v) => {
@@ -113,48 +112,39 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRa
             return `${String(v).padStart(2, "0")}:00`;
           }
         },
-        afterBuildTicks: (scale) => {
-          const t = [];
-          for (let v = 15; v <= 42; v += 3) {
-            t.push({ value: v });
-          }
-          scale.ticks = t;
+
+        afterBuildTicks(scale) {
+          const ticks = [];
+          for (let v = 15; v <= 42; v += 3) ticks.push({ value: v });
+          scale.ticks = ticks;
         }
       }
     },
 
     plugins: {
-
       tooltip: {
         callbacks: {
-
-          title: (context) => {
-            const date = new Date(context[0].raw.x);
-            return date.toLocaleDateString("en-US", {
-              year: "numeric",
+          title: (ctx) => {
+            const ts = ctx[0].raw.x;
+            return new Date(ts).toLocaleDateString("en-US", {
+              day: "2-digit",
               month: "short",
-              day: "numeric"
+              year: "numeric"
             });
           },
-
-          label: (context) => {
-            const [rawStart, rawEnd] = context.raw.y;
-
-            // Convert fractional hour → hh:mm
-            const toTime = (v) => {
+          label: (ctx) => {
+            const [s, e] = ctx.raw.y;
+            const fmt = (v) => {
               let h = Math.floor(v);
               let m = Math.round((v - h) * 60);
-
-              // wrap after 24h
               if (h >= 24) h -= 24;
-
               return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
             };
-
-            return `Sleep: ${toTime(rawStart)} → ${toTime(rawEnd)}`;
+            return `Sleep: ${fmt(s)} → ${fmt(e)}`;
           }
         }
       },
+
       zoom: {
         zoom: {
           wheel: { enabled: true },
@@ -164,11 +154,12 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange,sharedRa
           enabled: true,
           mode: "x",
         },
-        // 🔥 Call parent to sync ActivityGraph
+
         onZoomComplete: ({ chart }) => {
           const x = chart.scales.x;
           onRangeChange({ min: x.min, max: x.max });
         },
+
         onPanComplete: ({ chart }) => {
           const x = chart.scales.x;
           onRangeChange({ min: x.min, max: x.max });

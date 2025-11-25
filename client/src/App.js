@@ -26,36 +26,44 @@ function App() {
 
   // NEW: Auto-adjust X-axis when preset changes
   useEffect(() => {
-    if (!rangePreset || sleepData.length === 0) return;
+    
+    const today = new Date().setHours(0,0,0,0);
 
-    const allDates = sleepData.map(d => new Date(d.date).getTime());
-    const maxDate = Math.max(...allDates);
-    let min, max;
+
+    if (!rangePreset) {
+      setSharedRange({
+      min: today - 6 * 24 * 60 * 60 * 1000, //last 7 days
+      max: today
+    });
+    return;
+  }
+    let min;
 
     switch (rangePreset) {
       case "1W":
-        min = maxDate - 7 * 24 * 60 * 60 * 1000;
+        min = today - 6 * 24 * 60 * 60 * 1000;
         break;
       case "1M":
-        min = maxDate - 30 * 24 * 60 * 60 * 1000;
+        min = today - 29 * 24 * 60 * 60 * 1000;
         break;
       case "3M":
-        min = maxDate - 90 * 24 * 60 * 60 * 1000;
+        min = today - 89 * 24 * 60 * 60 * 1000;
         break;
       case "6M":
-        min = maxDate - 180 * 24 * 60 * 60 * 1000;
+        min = today - 179 * 24 * 60 * 60 * 1000;
         break;
       case "1Y":
-        min = maxDate - 365 * 24 * 60 * 60 * 1000;
+        min = today - 364 * 24 * 60 * 60 * 1000;
         break;
       case "RESET":
-        setSharedRange(null);
+        min = today - 6 * 24 * 60 * 60 * 1000; // last 30 days
+        setSharedRange({ min, max: today });
         return;
     }
 
-    max = maxDate;
-    setSharedRange({ min, max });
+    setSharedRange({ min, max: today});
   }, [rangePreset, sleepData]);
+
   return (
     <div className="min-h-screen bg-cover bg-center bg-fixed pt-20"
       style={{ backgroundImage: "url('/star-bg.jpg')" }}>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import CustomTimePicker from "./TimeInput24";
-
+import TimeInput24 from "./TimeInput24";
 
 export default function ActInput() {
   const [date, setDate] = useState("");
@@ -17,6 +16,7 @@ export default function ActInput() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
+  // Load activities
   useEffect(() => {
     async function load() {
       const res = await axios.get("http://localhost:5000/api/activity/all");
@@ -25,32 +25,31 @@ export default function ActInput() {
     load();
   }, []);
 
-  // convert picker → 24h
-  function to24h({ hour, minute, ampm }) {
-    let h = hour % 12;
-    if (ampm === "PM") h += 12;
-    return `${String(h).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  // Since TimeInput24 already returns "HH:mm", no conversion needed
+  function to24h(str) {
+    return str;
   }
 
-  // 🔥 SINGLE SAVE BUTTON HERE
   async function handleSave() {
     if (!date) return alert("Please choose a date!");
-    if (!mood && !selectedActivity) {
+    if (!mood && !selectedActivity)
       return alert("Select at least MOOD or ACTIVITY.");
-    }
 
-    // Save mood (if picked)
     if (mood) {
       await axios.post("http://localhost:5000/api/mood", { date, mood });
     }
 
-    // Save activity (if picked)
     if (selectedActivity) {
-      const activity = activities.find(a => a._id === selectedActivity);
+      const template = activities.find(a => a._id === selectedActivity);
+
+      if (!template) return alert("Activity not found!");
 
       await axios.post("http://localhost:5000/api/activity/log", {
         date,
-        activityId: activity._id,
+        title: template.title,
+        start: template.start,
+        end: template.end,
+        color: template.color
       });
     }
 
@@ -58,36 +57,37 @@ export default function ActInput() {
   }
 
   async function saveNewActivity() {
-    if (!newTitle || !startTime || !endTime) {
+    if (!newTitle || !startTime || !endTime)
       return alert("Fill all Activity fields!");
-    }
 
     const start24 = to24h(startTime);
     const end24 = to24h(endTime);
 
     await axios.post("http://localhost:5000/api/activity/create", {
-    title: newTitle,
-    date,
-    start: start24,
-    end: end24,
-    color: newColor
+      title: newTitle,
+      date,
+      start: start24,
+      end: end24,
+      color: newColor,
     });
 
     alert("New Activity Added!");
 
+    // Reset modal fields
     setModalOpen(false);
     setNewTitle("");
     setStartTime("");
     setEndTime("");
 
-    // reload
+    // Reload activities
     const res = await axios.get("http://localhost:5000/api/activity/all");
     setActivities(res.data);
   }
 
   return (
+    <>
     <div className="bg-gradient-to-br from-blue-600 to-blue-900 p-6 rounded-2xl shadow-lg text-white">
-      
+
       <h2 className="text-2xl font-bold mb-4">
         Add ur ACT <span className="text-sm opacity-80">when the day is done</span>
       </h2>
@@ -104,34 +104,19 @@ export default function ActInput() {
       {/* MOOD */}
       <label className="text-sm opacity-80">MOOD</label>
       <div className="flex gap-2 mt-2 mb-4">
-        <div className="flex gap-2 mt-2 mb-4">
-            <button
-                onClick={() => setMood(mood === "GOOD" ? "" : "GOOD")}
-                className={`px-3 py-2 rounded-lg transition-all
-                ${mood === "GOOD" ? "bg-white/40 border border-white shadow-lg" : "bg-white/20"}
-                `}
-            >
-                😊 GOOD
-            </button>
-
-            <button
-                onClick={() => setMood(mood === "MEH" ? "" : "MEH")}
-                className={`px-3 py-2 rounded-lg transition-all
-                ${mood === "MEH" ? "bg-white/40 border border-white shadow-lg" : "bg-white/20"}
-                `}
-            >
-                😐 MEH
-            </button>
-
-            <button
-                onClick={() => setMood(mood === "BAD" ? "" : "BAD")}
-                className={`px-3 py-2 rounded-lg transition-all
-                ${mood === "BAD" ? "bg-white/40 border border-white shadow-lg" : "bg-white/20"}
-                `}
-            >
-                😞 BAD
-            </button>
-</div>
+        {["GOOD", "MEH", "BAD"].map((m) => (
+          <button
+            key={m}
+            onClick={() => setMood(mood === m ? "" : m)}
+            className={`px-3 py-2 rounded-lg transition-all ${
+              mood === m ? "bg-white/40 border border-white shadow-lg" : "bg-white/20"
+            }`}
+          >
+            {m === "GOOD" && "😊 GOOD"}
+            {m === "MEH" && "😐 MEH"}
+            {m === "BAD" && "😞 BAD"}
+          </button>
+        ))}
       </div>
 
       {/* ACTIVITY */}
@@ -158,7 +143,7 @@ export default function ActInput() {
         </button>
       </div>
 
-      {/* SINGLE SAVE BUTTON */}
+      {/* SAVE BUTTON */}
       <button
         onClick={handleSave}
         className="mt-2 w-full bg-white/30 hover:bg-white/40 p-2 rounded-lg font-semibold"
@@ -166,10 +151,14 @@ export default function ActInput() {
         Save
       </button>
 
-      {/* MODAL */}
+      
+    </div>
+
+    {/* MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-          <div className="bg-white text-black p-6 rounded-xl w-80 shadow-lg">
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white text-black p-6 rounded-xl w-80 shadow-lg z-50">
+
             <h3 className="text-lg font-bold mb-3">Add New Activity</h3>
 
             <label>Title</label>
@@ -179,18 +168,24 @@ export default function ActInput() {
               onChange={(e) => setNewTitle(e.target.value)}
             />
 
-            <label>Start Time</label>
-            <CustomTimePicker value={startTime} onChange={setStartTime} />
+            <TimeInput24
+              label="Start Time"
+              value={startTime}
+              onChange={setStartTime}
+            />
 
-            <label className="mt-3">End Time</label>
-            <CustomTimePicker value={endTime} onChange={setEndTime} />
+            <TimeInput24
+              label="End Time"
+              value={endTime}
+              onChange={setEndTime}
+            />
 
             <label className="mt-3">Color</label>
             <input
-            type="color"
-            value={newColor}
-            onChange={(e) => setNewColor(e.target.value)}
-            className="w-full h-10 rounded mb-3 cursor-pointer"
+              type="color"
+              value={newColor}
+              onChange={(e) => setNewColor(e.target.value)}
+              className="w-full h-10 rounded mb-3 cursor-pointer"
             />
 
             <div className="flex justify-end gap-3 mt-4">
@@ -200,6 +195,7 @@ export default function ActInput() {
               >
                 Cancel
               </button>
+
               <button
                 className="px-4 py-2 bg-blue-600 text-white rounded"
                 onClick={saveNewActivity}
@@ -207,10 +203,10 @@ export default function ActInput() {
                 Save
               </button>
             </div>
+
           </div>
         </div>
       )}
-
-    </div>
+      </>
   );
 }

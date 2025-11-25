@@ -49,8 +49,7 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange, sharedR
   const formatted = sleepData.map((entry) => {
     const iso = entry.date.split("T")[0];
 
-    const ts = new Date(iso + "T00:00:00Z").getTime();  // ⭐ SAME AS ActivityGraph & presets
-
+    const ts = new Date(iso + "T00:00:00Z").getTime();  
     let start = toHour(entry.sleepTime);
     let end = toHour(entry.wakeTime);
 
@@ -73,12 +72,12 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange, sharedR
         type: "bar",
         label: "Sleep",
         data: formatted.map((d, i) => ({
-          x: d.ts + i * 60000,   // add 1 minute spacing per bar
+          x: d.ts,   
           y: [d.startHour, d.endHour]
         })),
         backgroundColor: formatted.map((d) => moodColor(d.mood)),
         borderRadius: 6,
-        barThickness: 20,
+        barThickness: 'flex',
         maxBarThickness: 20,
       }
     ]
@@ -90,14 +89,31 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange, sharedR
 
     scales: {
       x: {
-        type: "time",
-        time: {
-          unit: "day",
-          tooltipFormat: "dd MMM yyyy"
-        },
-        min: sharedRange?.min,
-        max: sharedRange?.max,
-        offset: true,
+          type: "time",
+          time: {
+            unit: "day",
+            tooltipFormat: "dd MMM yyyy"
+          },
+          min: sharedRange?.min,
+          max: sharedRange?.max,
+          offset: true,
+
+          afterBuildTicks: (scale) => {
+          const range = scale.max - scale.min;    // time span in ms
+          const days = range / (24*60*60*1000);   // convert to days
+
+          // shrink bars when zoomed out
+          let thickness;
+          if (days > 90) thickness = 4;     // >3 months
+          else if (days > 30) thickness = 10; // >1 month
+          else if (days > 10) thickness = 16;
+          else thickness = 20;
+
+          scale.chart.data.datasets.forEach(ds => {
+            ds.barThickness = thickness;
+            ds.maxBarThickness = thickness;
+          });
+        }
       },
 
       y: {
@@ -155,22 +171,34 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange, sharedR
           mode: "x",
         },
 
-        onZoomComplete: ({ chart }) => {
-          const x = chart.scales.x;
-          onRangeChange({ min: x.min, max: x.max });
-        },
+        //         onPanComplete: ({ chart }) => {
+        //   const x = chart.scales.x;
+        //   onRangeChange({
+        //     min: +x.getValueForPixel(x.left),   // convert to timestamp
+        //     max: +x.getValueForPixel(x.right)   // convert to timestamp
+        //   });
+        // },
 
-        onPanComplete: ({ chart }) => {
-          const x = chart.scales.x;
-          onRangeChange({ min: x.min, max: x.max });
-        }
+        // onZoomComplete: ({ chart }) => {
+        //   const x = chart.scales.x;
+        //   onRangeChange({
+        //     min: +x.getValueForPixel(x.left),
+        //     max: +x.getValueForPixel(x.right)
+        //   });
+        // }
       }
     }
   };
 
   return (
-    <div className="w-full h-[400px] bg-white p-4 rounded-xl shadow-lg mb-10">
-      <Chart ref={chartRef} type="bar" data={data} options={options} />
+    <div className="w-full h-[410px] bg-white p-4 rounded-xl shadow-lg mb-10">
+      <Chart
+        key={(sharedRange?.min || 0) + "-" + (sharedRange?.max || 0)}
+        ref={chartRef}
+        type="bar"
+        data={data}
+        options={options}
+      />
     </div>
   );
 }

@@ -19,16 +19,53 @@ ChartJS.register(
   Tooltip
 );
 
-// Convert HH:MM → 24h float
+/* ---------------------------------------------
+   SAFE BAR LABEL PLUGIN (NO INTERNAL PROPS!)
+--------------------------------------------- */
+const barLabelPlugin = {
+  id: "barLabelPlugin",
+  afterDatasetsDraw(chart) {
+    const { ctx, data, scales } = chart;
+
+    const ds = data.datasets[0];
+    const items = ds._formatted; // safe reference
+    const bars = chart.getDatasetMeta(0).data;
+
+    if (!items || !bars) return;
+
+    bars.forEach((bar, index) => {
+      const act = items[index];
+      if (!act) return;
+
+      // Convert hour → pixel using official API
+      const yTop = scales.y.getPixelForValue(act.startHour);
+      const yBottom = scales.y.getPixelForValue(act.endHour);
+      const yCenter = (yTop + yBottom) / 2;
+
+      const x = scales.x.getPixelForValue(act.x);
+
+      ctx.save();
+      ctx.fillStyle = "white";
+      ctx.font = "bold 12px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.fillText(act.title, x, yCenter);
+      ctx.restore();
+    });
+  }
+};
+
+ChartJS.register(barLabelPlugin);
+
+/* HH:MM → float */
 function toHour(str) {
   const [h, m] = str.split(":").map(Number);
   return h + m / 60;
 }
 
 export default function ActivityGraph({ activityData, sharedRange }) {
-
   const formatted = activityData.map(a => {
-
     const ts = new Date(a.date + "T00:00:00Z").getTime();
 
     let start = toHour(a.start);
@@ -55,7 +92,10 @@ export default function ActivityGraph({ activityData, sharedRange }) {
           y: [a.startHour, a.endHour]
         })),
         backgroundColor: formatted.map(a => a.color),
-        borderRadius: 4
+        borderRadius: 4,
+
+        // store a reference for plugin
+        _formatted: formatted
       }
     ]
   };
@@ -67,56 +107,28 @@ export default function ActivityGraph({ activityData, sharedRange }) {
     scales: {
       x: {
         type: "time",
-        time: {
-          unit: "day",
-          tooltipFormat: "dd MMM yyyy"
-        },
+        time: { unit: "day", tooltipFormat: "dd MMM yyyy" },
         min: sharedRange?.min,
         max: sharedRange?.max,
-        offset: true,
-
-        afterBuildTicks: (scale) => {
-          const range = scale.max - scale.min;
-          const days = range / (24 * 60 * 60 * 1000);
-
-          let thickness;
-          if (days > 90) thickness = 4;
-          else if (days > 30) thickness = 10;
-          else if (days > 10) thickness = 16;
-          else thickness = 20;
-
-          scale.chart.data.datasets.forEach(ds => {
-            ds.barThickness = thickness;
-            ds.maxBarThickness = thickness;
-          });
-        }
+        offset: true
       },
 
       y: {
         reverse: true,
         min: 0,
         max: 24,
-
-        grid: {
-          color: "rgba(0,0,0,0.08)"
-        },
-
         ticks: {
           stepSize: 1,
-          callback: (v) => `${String(v).padStart(2, "0")}:00`,
-          autoSkip: false,
-          maxRotation: 0,
-          minRotation: 0,
-          font: { size: 10 }
-        }
+          callback: v => `${String(v).padStart(2, "0")}:00`
+        },
+        grid: { color: "rgba(0,0,0,0.08)" }
       }
     },
 
-    // ⭐ ADD THIS ⭐
     plugins: {
       tooltip: {
         callbacks: {
-          title: (ctx) => {
+          title: ctx => {
             const ts = ctx[0].raw.x;
             return new Date(ts).toLocaleDateString("en-US", {
               day: "2-digit",
@@ -124,18 +136,18 @@ export default function ActivityGraph({ activityData, sharedRange }) {
               year: "numeric"
             });
           },
-
-          label: (ctx) => {
+          label: ctx => {
+            const act = formatted[ctx.dataIndex];
             const [start, end] = ctx.raw.y;
 
-            const format = (v) => {
+            const formatTime = v => {
               let h = Math.floor(v);
               let m = Math.round((v - h) * 60);
               if (h >= 24) h -= 24;
               return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
             };
 
-            return `Activity: ${format(start)} → ${format(end)}`;
+            return [`${act.title}`, `${formatTime(start)} → ${formatTime(end)}`];
           }
         }
       }

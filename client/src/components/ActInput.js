@@ -9,6 +9,7 @@ export default function ActInput() {
 
   const [activities, setActivities] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState("");
+  const [saveAsRoutine, setSaveAsRoutine] = useState(false);
 
   // Modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -16,7 +17,7 @@ export default function ActInput() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
-  // Load activities
+  // Load activity templates
   useEffect(() => {
     async function load() {
       const res = await axios.get("http://localhost:5000/api/activity/all");
@@ -25,140 +26,153 @@ export default function ActInput() {
     load();
   }, []);
 
-  // Since TimeInput24 already returns "HH:mm", no conversion needed
+  // Convert "HH:mm" directly (TimeInput24 already returns correct format)
   function to24h(str) {
     return str;
   }
 
+  /* 
+     HANDLE SAVE (MOOD + ACTIVITY LOGGING)
+  */
   async function handleSave() {
     if (!date) return alert("Please choose a date!");
     if (!mood && !selectedActivity)
       return alert("Select at least MOOD or ACTIVITY.");
 
+    // Save mood
     if (mood) {
       await axios.post("http://localhost:5000/api/mood", { date, mood });
     }
 
+    // Log activity
     if (selectedActivity) {
-      const template = activities.find(a => a._id === selectedActivity);
-
-      if (!template) return alert("Activity not found!");
-
       await axios.post("http://localhost:5000/api/activity/log", {
         date,
-        title: template.title,
-        start: template.start,
-        end: template.end,
-        color: template.color
+        activityId: selectedActivity
       });
     }
 
     alert("Saved!");
   }
 
+  /*
+     SAVE NEW TEMPLATE ACTIVITY
+   */
   async function saveNewActivity() {
-    if (!newTitle || !startTime || !endTime)
-      return alert("Fill all Activity fields!");
+  if (!date) return alert("Select a date before adding activity!");
+  if (!newTitle || !startTime || !endTime)
+    return alert("Fill all Activity fields!");
 
-    const start24 = to24h(startTime);
-    const end24 = to24h(endTime);
+  const start24 = to24h(startTime);
+  const end24 = to24h(endTime);
 
+  // 1. Log daily activity (ALWAYS)
+  await axios.post("http://localhost:5000/api/activity/log", {
+    date,
+    title: newTitle,
+    start: start24,
+    end: end24,
+    color: newColor,
+  });
+
+  // 2. Save as routine ONLY IF CHECKED
+  if (saveAsRoutine) {
     await axios.post("http://localhost:5000/api/activity/create", {
       title: newTitle,
-      date,
       start: start24,
       end: end24,
       color: newColor,
     });
-
-    alert("New Activity Added!");
-
-    // Reset modal fields
-    setModalOpen(false);
-    setNewTitle("");
-    setStartTime("");
-    setEndTime("");
-
-    // Reload activities
-    const res = await axios.get("http://localhost:5000/api/activity/all");
-    setActivities(res.data);
   }
+
+  alert("Activity Added!");
+
+  // Reset modal fields
+  setModalOpen(false);
+  setNewTitle("");
+  setStartTime("");
+  setEndTime("");
+  setSaveAsRoutine(false);
+
+  // Reload routines
+  const res = await axios.get("http://localhost:5000/api/activity/all");
+  setActivities(res.data);
+}
+
 
   return (
     <>
-    <div className="bg-gradient-to-br from-blue-600 to-blue-900 p-6 rounded-2xl shadow-lg text-white">
+      <div className="bg-gradient-to-br from-blue-600 to-blue-900 p-6 rounded-2xl shadow-lg text-white">
+        <h2 className="text-2xl font-bold mb-4">
+          Add ur ACT <span className="text-sm opacity-80">when the day is done</span>
+        </h2>
 
-      <h2 className="text-2xl font-bold mb-4">
-        Add ur ACT <span className="text-sm opacity-80">when the day is done</span>
-      </h2>
+        {/* DATE */}
+        <label className="text-sm opacity-80">DATE</label>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full mt-1 mb-3 bg-white/20 p-2 rounded-lg text-white"
+        />
 
-      {/* DATE */}
-      <label className="text-sm opacity-80">DATE</label>
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="w-full mt-1 mb-3 bg-white/20 p-2 rounded-lg text-white"
-      />
-
-      {/* MOOD */}
-      <label className="text-sm opacity-80">MOOD</label>
-      <div className="flex gap-2 mt-2 mb-4">
-        {["GOOD", "MEH", "BAD"].map((m) => (
-          <button
-            key={m}
-            onClick={() => setMood(mood === m ? "" : m)}
-            className={`px-3 py-2 rounded-lg transition-all ${
-              mood === m ? "bg-white/40 border border-white shadow-lg" : "bg-white/20"
-            }`}
-          >
-            {m === "GOOD" && "😊 GOOD"}
-            {m === "MEH" && "😐 MEH"}
-            {m === "BAD" && "😞 BAD"}
-          </button>
-        ))}
-      </div>
-
-      {/* ACTIVITY */}
-      <label className="text-sm opacity-80">ACTIVITY</label>
-      <div className="flex items-center gap-2 mt-1 mb-4">
-        <select
-          value={selectedActivity}
-          onChange={(e) => setSelectedActivity(e.target.value)}
-          className="flex-1 p-2 bg-white/20 rounded-lg text-white"
-        >
-          <option value="">Select Activity</option>
-          {activities.map((a) => (
-            <option key={a._id} value={a._id}>
-              {a.title}
-            </option>
+        {/* MOOD */}
+        <label className="text-sm opacity-80">MOOD</label>
+        <div className="flex gap-2 mt-2 mb-4">
+          {["GOOD", "MEH", "BAD"].map((m) => (
+            <button
+              key={m}
+              onClick={() => setMood(mood === m ? "" : m)}
+              className={`px-3 py-2 rounded-lg transition-all ${
+                mood === m ? "bg-white/40 border border-white shadow-lg" : "bg-white/20"
+              }`}
+            >
+              {m === "GOOD" && "😊 GOOD"}
+              {m === "MEH" && "😐 MEH"}
+              {m === "BAD" && "😞 BAD"}
+            </button>
           ))}
-        </select>
+        </div>
 
+        {/* ACTIVITY */}
+        <label className="text-sm opacity-80">ACTIVITY</label>
+        <div className="flex items-center gap-2 mt-1 mb-4">
+          <select
+            value={selectedActivity}
+            onChange={(e) => setSelectedActivity(e.target.value)}
+            className="flex-1 p-2 bg-white/20 rounded-lg text-white"
+          >
+            <option value="">Select Activity</option>
+            {activities.map((a) => (
+              <option key={a._id} value={a._id}>
+                {a.title}
+              </option>
+            ))}
+          </select>
+          
+          <button
+            className="bg-white/20 hover:bg-white/30 p-2 rounded-lg"
+            onClick={() => setModalOpen(true)}
+          >
+            + Add New
+          </button>
+
+          
+        </div>
+
+        {/* SAVE BUTTON */}
         <button
-          className="bg-white/20 hover:bg-white/30 p-2 rounded-lg"
-          onClick={() => setModalOpen(true)}
+          onClick={handleSave}
+          className="mt-2 w-full bg-white/30 hover:bg-white/40 p-2 rounded-lg font-semibold"
         >
-          + Add New
+          Save
         </button>
       </div>
 
-      {/* SAVE BUTTON */}
-      <button
-        onClick={handleSave}
-        className="mt-2 w-full bg-white/30 hover:bg-white/40 p-2 rounded-lg font-semibold"
-      >
-        Save
-      </button>
-
-      
-    </div>
-
-    {/* MODAL */}
+      {/* MODAL */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-white text-black p-6 rounded-xl w-80 shadow-lg z-50">
-
             <h3 className="text-lg font-bold mb-3">Add New Activity</h3>
 
             <label>Title</label>
@@ -188,6 +202,15 @@ export default function ActInput() {
               className="w-full h-10 rounded mb-3 cursor-pointer"
             />
 
+            <div className="flex items-center gap-2 mt-3">
+              <input
+                type="checkbox"
+                checked={saveAsRoutine}
+                onChange={(e) => setSaveAsRoutine(e.target.checked)}
+              />
+              <label>Save as routine activity</label>
+            </div>
+
             <div className="flex justify-end gap-3 mt-4">
               <button
                 className="px-4 py-2 bg-gray-300 rounded"
@@ -203,10 +226,9 @@ export default function ActInput() {
                 Save
               </button>
             </div>
-
           </div>
         </div>
       )}
-      </>
+    </>
   );
 }

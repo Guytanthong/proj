@@ -34,7 +34,7 @@ function moodColor(mood) {
   return "#9ca3af";
 }
 
-export default function SleepGraph({ sleepData, moodData, onRangeChange, sharedRange }) {
+export default function SleepGraph({ sleepData, moodData, sharedRange }) {
   const chartRef = useRef(null);
 
   // Mood one-day shift
@@ -171,21 +171,7 @@ export default function SleepGraph({ sleepData, moodData, onRangeChange, sharedR
           mode: "x",
         },
 
-        //         onPanComplete: ({ chart }) => {
-        //   const x = chart.scales.x;
-        //   onRangeChange({
-        //     min: +x.getValueForPixel(x.left),   // convert to timestamp
-        //     max: +x.getValueForPixel(x.right)   // convert to timestamp
-        //   });
-        // },
-
-        // onZoomComplete: ({ chart }) => {
-        //   const x = chart.scales.x;
-        //   onRangeChange({
-        //     min: +x.getValueForPixel(x.left),
-        //     max: +x.getValueForPixel(x.right)
-        //   });
-        // }
+       
       }
     }
   };

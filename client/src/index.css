@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Fix invisible dropdown text */
+select option {
+  color: black !important;
+  background: white !important;
+}

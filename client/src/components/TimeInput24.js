@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function TimeInput24({ label, value, onChange }) {
   const [open, setOpen] = useState(false);
 
-  const hours = Array.from({ length: 12 }, (_, i) =>
+  const hours12 = Array.from({ length: 12 }, (_, i) =>
     String(i + 1).padStart(2, "0")
   );
   const minutes = Array.from({ length: 60 }, (_, i) =>
@@ -11,48 +11,40 @@ export default function TimeInput24({ label, value, onChange }) {
   );
   const periods = ["AM", "PM"];
 
-  const handleSelect = (h12, m, period) => {
-    let h = Number(h12);
-
-    if (period === "AM" && h === 12) h = 0;
-    if (period === "PM" && h !== 12) h += 12;
-
-    const final = `${String(h).padStart(2, "0")}:${m}`;
-    onChange(final);
-    setOpen(false);
-  };
-
-  // parse existing value to 12h format for highlighting
-  let currentH = 12,
-    currentM = "00",
-    currentPeriod = "AM";
+  // Parse existing value to 12h format
+  let currentHour = 12;
+  let currentMinute = "00";
+  let currentPeriod = "AM";
 
   if (value && value.includes(":")) {
     const [hh, mm] = value.split(":");
+    currentMinute = mm;
     const h = Number(hh);
 
-    currentM = mm;
-
     if (h === 0) {
-      currentH = 12;
+      currentHour = 12;
       currentPeriod = "AM";
     } else if (h === 12) {
-      currentH = 12;
+      currentHour = 12;
       currentPeriod = "PM";
     } else if (h > 12) {
-      currentH = h - 12;
+      currentHour = h - 12;
       currentPeriod = "PM";
     } else {
-      currentH = h;
+      currentHour = h;
       currentPeriod = "AM";
     }
   }
 
-  const handleChange = (e) => {
-    let v = e.target.value.replace(/[^0-9:]/g, "");
-    if (v.length === 2 && !v.includes(":")) v += ":";
-    if (v.length > 5) v = v.slice(0, 5);
-    onChange(v);
+  // ALWAYS produce valid HH:MM 24h
+  const updateFinal = (h12, m, period) => {
+    let hour = Number(h12);
+
+    if (period === "AM" && hour === 12) hour = 0;
+    if (period === "PM" && hour !== 12) hour += 12;
+
+    const final = `${String(hour).padStart(2, "0")}:${m}`;
+    onChange(final);
   };
 
   return (
@@ -63,23 +55,24 @@ export default function TimeInput24({ label, value, onChange }) {
         type="text"
         value={value}
         placeholder="hh:mm"
-        onChange={handleChange}
         onClick={() => setOpen(!open)}
+        readOnly
         className="w-full bg-gray-100 text-black p-2 rounded-lg mt-1 text-center border cursor-pointer"
       />
 
       {open && (
         <div className="absolute mt-1 left-0 right-0 bg-white p-2 rounded-lg shadow-xl z-[9999] flex gap-2 justify-center">
+          
           {/* HOURS */}
           <div className="max-h-48 overflow-y-scroll pr-1 border-r">
-            {hours.map((h) => (
+            {hours12.map((h) => (
               <div
                 key={h}
-                onClick={() =>
-                  handleSelect(h, currentM, currentPeriod)
-                }
+                onClick={() => {
+                  updateFinal(h, currentMinute, currentPeriod);
+                }}
                 className={`p-2 text-center cursor-pointer hover:bg-blue-100 ${
-                  Number(h) === currentH ? "bg-blue-200 font-bold" : ""
+                  Number(h) === currentHour ? "bg-blue-200 font-bold" : ""
                 }`}
               >
                 {h}
@@ -92,15 +85,11 @@ export default function TimeInput24({ label, value, onChange }) {
             {minutes.map((m) => (
               <div
                 key={m}
-                onClick={() =>
-                  handleSelect(
-                    String(currentH).padStart(2, "0"),
-                    m,
-                    currentPeriod
-                  )
-                }
+                onClick={() => {
+                  updateFinal(String(currentHour).padStart(2, "0"), m, currentPeriod);
+                }}
                 className={`p-2 text-center cursor-pointer hover:bg-blue-100 ${
-                  m === currentM ? "bg-blue-200 font-bold" : ""
+                  m === currentMinute ? "bg-blue-200 font-bold" : ""
                 }`}
               >
                 {m}
@@ -113,13 +102,9 @@ export default function TimeInput24({ label, value, onChange }) {
             {periods.map((p) => (
               <div
                 key={p}
-                onClick={() =>
-                  handleSelect(
-                    String(currentH).padStart(2, "0"),
-                    currentM,
-                    p
-                  )
-                }
+                onClick={() => {
+                  updateFinal(String(currentHour).padStart(2, "0"), currentMinute, p);
+                }}
                 className={`p-2 text-center cursor-pointer hover:bg-blue-100 ${
                   p === currentPeriod ? "bg-blue-200 font-bold" : ""
                 }`}
@@ -128,6 +113,7 @@ export default function TimeInput24({ label, value, onChange }) {
               </div>
             ))}
           </div>
+
         </div>
       )}
     </div>

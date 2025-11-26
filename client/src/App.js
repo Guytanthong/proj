@@ -17,12 +17,11 @@ function App() {
   // NEW: Shared date range for both graphs
   const [sharedRange, setSharedRange] = useState(null);
 
-  useEffect(() => {
-    axios.get("http://localhost:5000/api/sleep").then(res => setSleepData(res.data));
-    axios.get("http://localhost:5000/api/mood").then(res => setMoodData(res.data));
-    axios.get("http://localhost:5000/api/activity/all").then(res => setActivityData(res.data));
-  }, []);
-
+ useEffect(() => {
+  axios.get("http://localhost:5000/api/sleep").then(res => setSleepData(res.data));
+  axios.get("http://localhost:5000/api/mood").then(res => setMoodData(res.data));
+  axios.get("http://localhost:5000/api/activity/logs").then(res => setActivityData(res.data));
+}, []);
 
   // NEW: Auto-adjust X-axis when preset changes
   useEffect(() => {

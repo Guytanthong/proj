@@ -13,6 +13,7 @@ function App() {
   const [activityData, setActivityData] = useState([]);
   const [rangePreset, setRangePreset] = useState(null);
   
+  
 
   // NEW: Shared date range for both graphs
   const [sharedRange, setSharedRange] = useState(null);

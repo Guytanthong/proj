@@ -1,4 +1,4 @@
-import  { useRef } from "react";
+import { useRef, useEffect } from "react";
 import {
   Chart as ChartJS,
   BarElement,
@@ -34,6 +34,7 @@ function moodColor(mood) {
   return "#9ca3af";
 }
 
+
 export default function SleepGraph({ sleepData, moodData, sharedRange }) {
   const chartRef = useRef(null);
 
@@ -49,7 +50,9 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
   const formatted = sleepData.map((entry) => {
     const iso = entry.date.split("T")[0];
 
-    const ts = new Date(iso + "T00:00:00Z").getTime();  
+    const tsDate = new Date(iso);
+    tsDate.setHours(0, 0, 0, 0);   //  LOCAL MIDNIGHT
+    const ts = tsDate.getTime();
     let start = toHour(entry.sleepTime);
     let end = toHour(entry.wakeTime);
 
@@ -175,7 +178,16 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
       }
     }
   };
+  useEffect(() => {
+    if (!chartRef.current) return;
+    const chart = chartRef.current;
 
+    try {
+      chart.resetZoom();  // <-- important
+    } catch (e) {
+      console.log("resetZoom not available yet");
+    }
+  }, [sharedRange]);
   return (
     <div className="w-full h-[410px] bg-white p-4 rounded-xl shadow-lg mb-10">
       <Chart

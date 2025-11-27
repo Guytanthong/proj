@@ -3,34 +3,38 @@ const router = express.Router();
 const Sleep = require("../models/Sleep");
 
 // POST — add a new sleep record
+// POST — create or update sleep for a given date
 router.post("/", async (req, res) => {
   try {
-    const { date, sleepTime, wakeTime } = req.body;
+    const { date, sleepTime, wakeTime, mood } = req.body;
 
-    if (!date || !sleepTime || !wakeTime) {
-      return res.status(400).json({ message: "Missing required fields" });
+    // Check if sleep record already exists for that date
+    let existing = await Sleep.findOne({ date });
+
+    if (existing) {
+      // Update existing record
+      existing.sleepTime = sleepTime;
+      existing.wakeTime = wakeTime;
+      existing.mood = mood;
+      await existing.save();
+
+      return res.json({
+        message: "Updated existing sleep entry",
+        updated: existing
+      });
     }
 
-    // calculate sleep duration
-    const sleepDate = new Date(`${date}T${sleepTime}`);
-    const wakeDate = new Date(`${date}T${wakeTime}`);
-    let durationHours = (wakeDate - sleepDate) / (1000 * 60 * 60);
+    // Create new record
+    const newEntry = new Sleep(req.body);
+    await newEntry.save();
 
-    // if wake time is next day
-    if (durationHours < 0) durationHours += 24;
-
-    const newSleep = new Sleep({
-      date,
-      sleepTime,
-      wakeTime,
-      durationHours,
+    res.json({
+      message: "Created new sleep entry",
+      created: newEntry
     });
 
-    await newSleep.save();
-    res.status(201).json(newSleep);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error saving sleep data" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

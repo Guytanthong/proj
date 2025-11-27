@@ -189,7 +189,7 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
     }
   }, [sharedRange]);
   return (
-    <div className="w-full h-[410px] bg-white p-4 rounded-xl shadow-lg mb-10">
+    <div className="w-full h-[480px] bg-white p-4 rounded-xl shadow-lg mb-10">
       <Chart
         key={(sharedRange?.min || 0) + "-" + (sharedRange?.max || 0)}
         ref={chartRef}

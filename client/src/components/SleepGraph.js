@@ -34,11 +34,10 @@ function moodColor(mood) {
   return "#9ca3af";
 }
 
-
 export default function SleepGraph({ sleepData, moodData, sharedRange }) {
   const chartRef = useRef(null);
 
-  // Mood one-day shift
+  // Mood 1-day shift map
   const moodMap = {};
   moodData.forEach((m) => {
     const d = new Date(m.date);
@@ -46,13 +45,14 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
     moodMap[d.toISOString().split("T")[0]] = m.mood;
   });
 
-  // Sleep format
+  // Format sleep data
   const formatted = sleepData.map((entry) => {
     const iso = entry.date.split("T")[0];
 
     const tsDate = new Date(iso);
-    tsDate.setHours(0, 0, 0, 0);   //  LOCAL MIDNIGHT
+    tsDate.setHours(0, 0, 0, 0);
     const ts = tsDate.getTime();
+
     let start = toHour(entry.sleepTime);
     let end = toHour(entry.wakeTime);
 
@@ -74,13 +74,13 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
       {
         type: "bar",
         label: "Sleep",
-        data: formatted.map((d, i) => ({
-          x: d.ts,   
-          y: [d.startHour, d.endHour]
+        data: formatted.map((d) => ({
+          x: d.ts,
+          y: [d.startHour, d.endHour],
         })),
         backgroundColor: formatted.map((d) => moodColor(d.mood)),
         borderRadius: 6,
-        barThickness: 'flex',
+        barThickness: "flex",
         maxBarThickness: 20,
       }
     ]
@@ -90,65 +90,92 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
     responsive: true,
     maintainAspectRatio: false,
 
+    layout: {
+      padding: 20,
+    },
+
     scales: {
       x: {
-          type: "time",
-          time: {
-            unit: "day",
-            tooltipFormat: "dd MMM yyyy"
-          },
-          min: sharedRange?.min,
-          max: sharedRange?.max,
-          offset: true,
+        type: "time",
+        time: {
+          unit: "day",
+          tooltipFormat: "dd MMM yyyy",
+        },
+        min: sharedRange?.min,
+        max: sharedRange?.max,
+        offset: true,
 
-          afterBuildTicks: (scale) => {
-          const range = scale.max - scale.min;    // time span in ms
-          const days = range / (24*60*60*1000);   // convert to days
+        grid: {
+          color: "rgba(255,255,255,0.06)",
+          lineWidth: 1,
+        },
 
-          // shrink bars when zoomed out
+        ticks: {
+          color: "#cbd5e1",
+          font: { size: 12 },
+        },
+
+        afterBuildTicks: (scale) => {
+          const range = scale.max - scale.min;
+          const days = range / (24 * 60 * 60 * 1000);
+
           let thickness;
-          if (days > 90) thickness = 4;     // >3 months
-          else if (days > 30) thickness = 10; // >1 month
+          if (days > 90) thickness = 4;
+          else if (days > 30) thickness = 10;
           else if (days > 10) thickness = 16;
           else thickness = 20;
 
-          scale.chart.data.datasets.forEach(ds => {
+          scale.chart.data.datasets.forEach((ds) => {
             ds.barThickness = thickness;
             ds.maxBarThickness = thickness;
           });
-        }
+        },
       },
 
       y: {
         reverse: true,
-        min: Math.min(...formatted.map(d => d.startHour)) - 1,
-        max: Math.max(...formatted.map(d => d.endHour)) + 1,
+        min: Math.min(...formatted.map((d) => d.startHour)) - 1,
+        max: Math.max(...formatted.map((d) => d.endHour)) + 1,
+
+        grid: {
+          color: "rgba(255,255,255,0.05)",
+        },
 
         ticks: {
           stepSize: 3,
+          color: "#94a3b8",
+          font: { size: 12 },
           callback: (v) => {
             if (v >= 24) v -= 24;
             return `${String(v).padStart(2, "0")}:00`;
-          }
+          },
         },
 
         afterBuildTicks(scale) {
           const ticks = [];
           for (let v = 15; v <= 42; v += 3) ticks.push({ value: v });
           scale.ticks = ticks;
-        }
-      }
+        },
+      },
     },
 
     plugins: {
+      legend: { display: false },
+
       tooltip: {
+        backgroundColor: "rgba(15,23,42,0.9)",
+        borderColor: "#334155",
+        borderWidth: 1,
+        titleColor: "#f1f5f9",
+        bodyColor: "#e2e8f0",
+
         callbacks: {
           title: (ctx) => {
             const ts = ctx[0].raw.x;
             return new Date(ts).toLocaleDateString("en-US", {
               day: "2-digit",
               month: "short",
-              year: "numeric"
+              year: "numeric",
             });
           },
           label: (ctx) => {
@@ -160,8 +187,8 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
               return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
             };
             return `Sleep: ${fmt(s)} → ${fmt(e)}`;
-          }
-        }
+          },
+        },
       },
 
       zoom: {
@@ -173,23 +200,20 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
           enabled: true,
           mode: "x",
         },
-
-       
-      }
-    }
+      },
+    },
   };
+
+  // Reset zoom when range changes
   useEffect(() => {
     if (!chartRef.current) return;
-    const chart = chartRef.current;
-
     try {
-      chart.resetZoom();  // <-- important
-    } catch (e) {
-      console.log("resetZoom not available yet");
-    }
+      chartRef.current.resetZoom();
+    } catch {}
   }, [sharedRange]);
+
   return (
-    <div className="w-full h-[480px] bg-white p-4 rounded-xl shadow-lg mb-10">
+    <div className="w-full h-[480px] rounded-xl shadow-lg bg-[#0f172a]">
       <Chart
         key={(sharedRange?.min || 0) + "-" + (sharedRange?.max || 0)}
         ref={chartRef}

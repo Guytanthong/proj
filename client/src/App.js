@@ -118,7 +118,7 @@ function App() {
         <div className="flex-1 flex flex-col gap-5">
 
           {/* SLEEP GRAPH BOX */}
-          <div className="relative w-[2000px] bg-white h-[530px] rounded-xl shadow-lg overflow-hidden">
+          <div className="relative w-[2000px] bg-[#02060f] h-[530px] rounded-xl shadow-lg overflow-hidden">
 
             {/* TOP CONTROLS */}
             <div className="absolute top-0 left-0 right-0 z-20 

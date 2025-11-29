@@ -27,3 +27,70 @@ select option {
   background-image: linear-gradient(43deg, #47290b 0%, #c2864a 46%, #eb9749 100%);
 }
 /* "bg-gradient-to-br from-orange-600 to-yellow-700 p-6 rounded-2xl shadow-lg text-white w-[350px]" */
+
+
+/* button mood */
+
+:root {
+  --mood-good: #22c55e;
+  --mood-meh:  #f59e0b;
+  --mood-bad:  #ef4444;
+}
+
+.mood-btn {
+  width: 90px;
+  position: relative;
+  overflow: hidden;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid transparent;
+  cursor: pointer;
+  color: white;
+  transition: 200ms ease;
+}
+
+.mood-btn .label {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ripple hover layer (does NOT touch text) */
+.mood-btn .transition {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  transition: width 0.6s ease, height 0.6s ease, background 0.6s ease;
+}
+
+/* GOOD hover */
+.mood-btn.good:hover .transition {
+  width: 250px;
+  height: 250px;
+  background-color: var(--mood-good);
+}
+
+/* MEH hover */
+.mood-btn.meh:hover .transition {
+  width: 250px;
+  height: 250px;
+  background-color: var(--mood-meh);
+}
+
+/* BAD hover */
+.mood-btn.bad:hover .transition {
+  width: 250px;
+  height: 250px;
+  background-color: var(--mood-bad);
+}
+
+/* Active mood (selected) */
+.mood-btn.active {
+  border: 1px solid white;
+  background: rgba(255, 255, 255, 0.25);
+}

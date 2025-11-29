@@ -119,19 +119,24 @@ export default function ActInput() {
         {/* MOOD */}
         <label className="text-sm opacity-80">MOOD</label>
         <div className="flex gap-2 mt-2 mb-4">
+
           {["GOOD", "MEH", "BAD"].map((m) => (
             <button
               key={m}
               onClick={() => setMood(mood === m ? "" : m)}
-              className={`px-3 py-2 rounded-lg transition-all ${
-                mood === m ? "bg-white/40 border border-white shadow-lg" : "bg-white/20"
-              }`}
+              className={`mood-btn 
+                ${m.toLowerCase()} 
+                ${mood === m ? "active" : ""}`}
             >
-              {m === "GOOD" && "😊 GOOD"}
-              {m === "MEH" && "😐 MEH"}
-              {m === "BAD" && "😞 BAD"}
+              <span className="transition"></span>
+              <span className="label">
+                {m === "GOOD" && "GOOD"}
+                {m === "MEH" && "MEH"}
+                {m === "BAD" && "BAD"}
+              </span>
             </button>
           ))}
+
         </div>
 
         {/* ACTIVITY */}

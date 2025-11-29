@@ -102,7 +102,7 @@ export default function ActInput() {
 
   return (
     <>
-      <div className="bg-gradient-to-br from-blue-600 to-blue-900 p-6 rounded-2xl shadow-lg text-white">
+      <div className= "card card-act" >
         <h2 className="text-2xl font-bold mb-4">
           Add ur ACT <span className="text-sm opacity-80">when the day is done</span>
         </h2>

@@ -102,15 +102,14 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-fixed pt-20"
-      style={{ backgroundImage: "url('/star-bg.jpg')" }}>
+    <div className="min-h-screen bg-gray-950 bg-center bg-fixed pt-20">
 
       <Header />
 
-      <div className="max-w-[1500px] mx-auto flex gap-10 p-10">
+      <div className="max-w-[1500px] ml-10 flex gap-10 p-10">
 
         {/* LEFT SIDE */}
-        <div className="w-[340px] flex flex-col gap-8">
+        <div className="w-[360px] flex flex-col gap-8 ">
           <SleepTracker />
           <ActInput />
         </div>
@@ -119,7 +118,7 @@ function App() {
         <div className="flex-1 flex flex-col gap-5">
 
           {/* SLEEP GRAPH BOX */}
-          <div className="relative w-full bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="relative w-[2000px] bg-white h-[530px] rounded-xl shadow-lg overflow-hidden">
 
             {/* TOP CONTROLS */}
             <div className="absolute top-0 left-0 right-0 z-20 

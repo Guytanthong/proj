@@ -4,14 +4,14 @@ const router = express.Router();
 const Activity = require("../models/Activity");      // Routine templates
 const ActivityLog = require("../models/ActivityLog"); // Daily logs
 
-console.log("🔥 activityRoutes.js LOADED");
+
 
 
 // 
 //  CREATE ROUTINE TEMPLATE  (/create)
 // 
 router.post("/create", async (req, res) => {
-  console.log("🔥 CREATE REQUEST BODY:", req.body);
+  
 
   try {
     const { title, start, end, color } = req.body;

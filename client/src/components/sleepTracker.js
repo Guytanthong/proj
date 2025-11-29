@@ -45,7 +45,7 @@ function SleepTracker() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-orange-600 to-yellow-700 p-6 rounded-2xl shadow-lg text-white">
+    <div className= "card card-sleep">
 
       <h2 className="text-2xl font-bold mb-4">
         Add your SLEEP <span className="text-sm opacity-80">when u wake</span>

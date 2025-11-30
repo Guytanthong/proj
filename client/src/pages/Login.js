@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { login } from "../authService";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
     try {
       await login(email, password);
-      alert("Logged in!");
+      navigate("/", { replace: true });
       // Optional: redirect after login
       // window.location.href = "/dashboard";
     } catch (err) {

@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import axios from "axios";
 import SleepTracker from "./components/sleepTracker";
 import SleepGraph from "./components/SleepGraph";
 import Header from "./components/Header";
 import ActInput from "./components/ActInput";
 import ActivityGraph from "./components/ActivityGraph";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
+
 
 
 
@@ -132,12 +134,13 @@ function App() {
   <Routes>
 
     {/* LOGIN PAGE */}
+    <Route path="/" element={<Home />} />
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<Signup />} />
 
     {/* MAIN DASHBOARD */}
     <Route
-      path="/"
+      path="/dashboard"
       element={
       <ProtectedRoute>
           <div className="min-h-screen bg-gray-950 bg-center bg-fixed pt-20">

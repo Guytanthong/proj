@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const ActivitySchema = new mongoose.Schema({
+  uid: { type: String, required: true },
   title: { type: String, required: true },   // e.g. "Study"
   start: { type: String, required: true },   // "HH:MM"
   end: { type: String, required: true },     // "HH:MM"

@@ -1,11 +1,15 @@
 import { useState } from "react";
 import axios from "axios";
+import { auth } from "../firebase";
 
 function SleepTracker() {
   const [date, setDate] = useState("");
   const [sleepTime, setSleepTime] = useState("");   // now a string "HH:mm"
   const [wakeTime, setWakeTime] = useState("");     // string "HH:mm"
 
+  function getUID() {
+    return auth.currentUser?.uid || null;
+  }
   // Ensure "H:M" → "HH:MM"
   function formatTime(str) {
     if (!str) return "";
@@ -18,6 +22,9 @@ function SleepTracker() {
       alert("Please fill all fields!");
       return;
     }
+
+    const uid = getUID();
+    if (!uid) return alert("You must be logged in!");
 
     const sleepString = formatTime(sleepTime);
     const wakeString = formatTime(wakeTime);
@@ -32,6 +39,7 @@ function SleepTracker() {
 
     try {
       await axios.post("http://localhost:5000/api/sleep", {
+        uid,
         date,
         sleepTime: sleepString,
         wakeTime: wakeString

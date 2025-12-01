@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 
 
@@ -31,10 +33,28 @@ function App() {
   });
   
  useEffect(() => {
-  axios.get("http://localhost:5000/api/sleep").then(res => setSleepData(res.data));
-  axios.get("http://localhost:5000/api/mood").then(res => setMoodData(res.data));
-  axios.get("http://localhost:5000/api/activity/logs").then(res => setActivityData(res.data));
-}, []);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+
+      setSleepData([]);
+      setMoodData([]);
+      setActivityData([]);
+
+
+      const uid = user.uid;
+
+      axios.get("http://localhost:5000/api/sleep", { params: { uid } })
+        .then(res => setSleepData(res.data));
+
+      axios.get("http://localhost:5000/api/mood", { params: { uid } })
+        .then(res => setMoodData(res.data));
+
+      axios.get("http://localhost:5000/api/activity/logs", { params: { uid } })
+        .then(res => setActivityData(res.data));
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // NEW: Auto-adjust X-axis when preset changes
   useEffect(() => {

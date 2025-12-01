@@ -2,17 +2,20 @@ const express = require("express");
 const router = express.Router();
 const Sleep = require("../models/Sleep");
 
-// POST — add a new sleep record
-// POST — create or update sleep for a given date
+//
+// POST — create or update sleep entry for this user
+//
 router.post("/", async (req, res) => {
   try {
-    const { date, sleepTime, wakeTime, mood } = req.body;
+    const { uid, date, sleepTime, wakeTime, mood } = req.body;
 
-    // Check if sleep record already exists for that date
-    let existing = await Sleep.findOne({ date });
+    if (!uid) return res.status(400).json({ error: "Missing UID" });
+    if (!date) return res.status(400).json({ error: "Missing date" });
+
+    // Find this user's entry for THAT date
+    let existing = await Sleep.findOne({ uid, date });
 
     if (existing) {
-      // Update existing record
       existing.sleepTime = sleepTime;
       existing.wakeTime = wakeTime;
       existing.mood = mood;
@@ -24,27 +27,43 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // Create new record
-    const newEntry = new Sleep(req.body);
+    // Create new entry
+    const newEntry = new Sleep({
+      uid,
+      date,
+      sleepTime,
+      wakeTime,
+      mood
+    });
+
     await newEntry.save();
 
-    res.json({
+    return res.json({
       message: "Created new sleep entry",
       created: newEntry
     });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 
-// GET — get all sleep records
+
+//
+// GET — only return THIS user's sleep records
+//
 router.get("/", async (req, res) => {
   try {
-    const sleeps = await Sleep.find().sort({ date: 1 });
+    const { uid } = req.query;
+
+    if (!uid) return res.status(400).json({ error: "Missing UID" });
+
+    const sleeps = await Sleep.find({ uid }).sort({ date: 1 });
+
     res.json(sleeps);
+    
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 });
 

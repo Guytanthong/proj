@@ -1,4 +1,4 @@
-const habitRoutes = require('./routes/habitRoutes');
+
 const sleepRoutes = require("./routes/sleepRoutes");
 const moodRoutes = require("./routes/moodRoutes");
 const activityRoutes = require("./routes/activityRoutes");
@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.use('/api/habits', habitRoutes);
+
 app.use("/api/sleep", sleepRoutes);
 app.use("/api/mood", moodRoutes);
 app.use("/api/activity", activityRoutes);

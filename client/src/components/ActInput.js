@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import TimeInput24 from "./TimeInput24";
+import { auth } from "../firebase";
 
 export default function ActInput() {
   const [date, setDate] = useState("");
@@ -17,10 +18,13 @@ export default function ActInput() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
+  function getUID() {
+    return auth.currentUser?.uid || null;
+  }
   // Load activity templates
   useEffect(() => {
     async function load() {
-      const res = await axios.get("http://localhost:5000/api/activity/all");
+      const res = await axios.get("http://localhost:5000/api/activity/all", {params: { uid: getUID() }});
       setActivities(res.data);
     }
     load();
@@ -39,14 +43,22 @@ export default function ActInput() {
     if (!mood && !selectedActivity)
       return alert("Select at least MOOD or ACTIVITY.");
 
+    const uid = getUID();
+    if (!uid) return alert("You must be logged in!");
+
     // Save mood
     if (mood) {
-      await axios.post("http://localhost:5000/api/mood", { date, mood });
+      await axios.post("http://localhost:5000/api/mood", {
+        uid,
+        date,
+        mood,
+      });
     }
 
-    // Log activity
+    // Log activity using template
     if (selectedActivity) {
       await axios.post("http://localhost:5000/api/activity/log", {
+        uid,
         date,
         activityId: selectedActivity
       });
@@ -55,49 +67,57 @@ export default function ActInput() {
     alert("Saved!");
   }
 
+
   /*
      SAVE NEW TEMPLATE ACTIVITY
    */
   async function saveNewActivity() {
-  if (!date) return alert("Select a date before adding activity!");
-  if (!newTitle || !startTime || !endTime)
-    return alert("Fill all Activity fields!");
+    if (!date) return alert("Select a date before adding activity!");
+    if (!newTitle || !startTime || !endTime)
+      return alert("Fill all Activity fields!");
 
-  const start24 = to24h(startTime);
-  const end24 = to24h(endTime);
+    const uid = getUID();
+    if (!uid) return alert("You must be logged in!");
 
-  // 1. Log daily activity (ALWAYS)
-  await axios.post("http://localhost:5000/api/activity/log", {
-    date,
-    title: newTitle,
-    start: start24,
-    end: end24,
-    color: newColor,
-  });
+    const start24 = to24h(startTime);
+    const end24 = to24h(endTime);
 
-  // 2. Save as routine ONLY IF CHECKED
-  if (saveAsRoutine) {
-    await axios.post("http://localhost:5000/api/activity/create", {
+    // 1. Log daily activity (ALWAYS)
+    await axios.post("http://localhost:5000/api/activity/log", {
+      uid,
+      date,
       title: newTitle,
       start: start24,
       end: end24,
       color: newColor,
     });
+
+    // 2. Save as routine ONLY IF CHECKED
+    if (saveAsRoutine) {
+      await axios.post("http://localhost:5000/api/activity/create", {
+        uid,
+        title: newTitle,
+        start: start24,
+        end: end24,
+        color: newColor,
+      });
+    }
+
+    alert("Activity Added!");
+
+    // Reset modal fields
+    setModalOpen(false);
+    setNewTitle("");
+    setStartTime("");
+    setEndTime("");
+    setSaveAsRoutine(false);
+
+    // Reload routines
+    const res = await axios.get("http://localhost:5000/api/activity/all", {
+      params: { uid }
+    });
+    setActivities(res.data);
   }
-
-  alert("Activity Added!");
-
-  // Reset modal fields
-  setModalOpen(false);
-  setNewTitle("");
-  setStartTime("");
-  setEndTime("");
-  setSaveAsRoutine(false);
-
-  // Reload routines
-  const res = await axios.get("http://localhost:5000/api/activity/all");
-  setActivities(res.data);
-}
 
 
   return (

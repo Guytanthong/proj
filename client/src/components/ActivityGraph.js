@@ -198,7 +198,7 @@ export default function ActivityGraph({ activityData, sharedRange }) {
           font: { size: 14 }
         },
         grid: {
-          drawOnChartArea: false,   // ❗ don't duplicate the grid lines
+          drawOnChartArea: false,   //don't duplicate the grid lines
         }
       }
     }

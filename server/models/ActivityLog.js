@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const ActivityLogSchema = new mongoose.Schema({
+  uid: { type: String, required: true },
   date: { type: String, required: true },    // "YYYY-MM-DD"
   title: { type: String, required: true },
   start: { type: String, required: true },

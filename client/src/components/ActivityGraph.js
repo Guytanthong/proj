@@ -1,7 +1,9 @@
 import React from "react";
 import { Chart } from "react-chartjs-2";
+import "chartjs-adapter-date-fns";
 import {
   Chart as ChartJS,
+  BarController,
   BarElement,
   CategoryScale,
   LinearScale,
@@ -9,15 +11,17 @@ import {
   Tooltip
 } from "chart.js";
 
-import "chartjs-adapter-date-fns";
-
 ChartJS.register(
+  BarController,
   BarElement,
   CategoryScale,
   LinearScale,
   TimeScale,
   Tooltip
 );
+
+
+
 
 /* -------------------------
    BAR LABEL PLUGIN

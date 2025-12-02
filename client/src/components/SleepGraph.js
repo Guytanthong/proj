@@ -1,6 +1,11 @@
 import { useRef, useEffect } from "react";
+import zoomPlugin from "chartjs-plugin-zoom";
+import "chartjs-adapter-date-fns";
+import { Chart } from "react-chartjs-2";
+
 import {
   Chart as ChartJS,
+  BarController,
   BarElement,
   CategoryScale,
   LinearScale,
@@ -8,11 +13,8 @@ import {
   Tooltip
 } from "chart.js";
 
-import zoomPlugin from "chartjs-plugin-zoom";
-import "chartjs-adapter-date-fns";
-import { Chart } from "react-chartjs-2";
-
 ChartJS.register(
+  BarController,
   BarElement,
   CategoryScale,
   LinearScale,
@@ -20,6 +22,9 @@ ChartJS.register(
   Tooltip,
   zoomPlugin
 );
+
+
+
 
 // Convert "HH:MM" → hours float
 function toHour(str) {

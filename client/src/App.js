@@ -90,10 +90,14 @@ function App() {
         min = today - 364 * 24 * 60 * 60 * 1000;
         break;
       case "RESET":
-        setCurrentMonth("");   // ← EXIT MONTH MODE
-        min = today - 6 * 24 * 60 * 60 * 1000; // last 30 days
+        setCurrentMonth("");
+        min = today - 6 * 24 * 60 * 60 * 1000;
         setSharedRange({ min, max: today });
         return;
+
+      default:
+        min = today - 6 * 24 * 60 * 60 * 1000;
+        break;
     }
 
     setSharedRange({ min, max: today});

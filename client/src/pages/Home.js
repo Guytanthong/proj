@@ -59,7 +59,7 @@ export default function Home() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br 
                               from-blue-500/20 via-purple-500/20 to-pink-500/20 
                               opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-              <img src="/icons/sleep.png" className="w-12 h-12 mb-4 opacity-90" />
+              <img src="/icons/sleep.png" alt="" className="w-12 h-12 mb-4 opacity-90" />
               <h3 className="text-2xl font-semibold mb-2">Track Sleep</h3>
               <p className="text-gray-200 text-sm leading-relaxed">
                 Understand your nights with premium insights and restful visual analytics.
@@ -73,7 +73,7 @@ export default function Home() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br 
                               from-blue-500/20 via-purple-500/20 to-pink-500/20 
                               opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-              <img src="/icons/sleep.png" className="w-12 h-12 mb-4 opacity-90" />
+              <img src="/icons/sleep.png" alt="" className="w-12 h-12 mb-4 opacity-90" />
               <h3 className="text-2xl font-semibold mb-2">Log Activities</h3>
               <p className="text-gray-200 text-sm leading-relaxed">
                 Build healthy routines with seamless activity tracking.
@@ -87,7 +87,7 @@ export default function Home() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br 
                               from-blue-500/20 via-purple-500/20 to-pink-500/20 
                               opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-              <img src="/icons/sleep.png" className="w-12 h-12 mb-4 opacity-90" />
+              <img src="/icons/sleep.png" alt="" className="w-12 h-12 mb-4 opacity-90" />
               <h3 className="text-2xl font-semibold mb-2">Monitor Mood</h3>
               <p className="text-gray-200 text-sm leading-relaxed">
                 Reflect on your emotional balance over time.

@@ -23,6 +23,7 @@ function Header() {
       <img
         src="/logo.png"
         className="w-20 h-20 cursor-pointer"
+        alt="logo"
         onClick={() => navigate("/")}
       />
       <h1 className="text-white text-4xl font-bold tracking-wide">

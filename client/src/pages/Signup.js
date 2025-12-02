@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { signup } from "../authService";
+import Header from "../components/Header";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -21,7 +22,9 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
+      
+      <Header />
       <form
         onSubmit={handleSignup}
         className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm"

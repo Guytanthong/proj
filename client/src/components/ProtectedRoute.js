@@ -18,9 +18,9 @@ export default function ProtectedRoute({ children }) {
     return <div className="text-white p-10">Loading...</div>;
   }
 
-  // Not logged in → redirect to login
+  // Not logged in → redirect to home
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // Logged in → show content

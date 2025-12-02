@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login } from "../authService";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ export default function Login() {
     setError("");
     try {
       await login(email, password);
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
       // Optional: redirect after login
       // window.location.href = "/dashboard";
     } catch (err) {
@@ -22,7 +23,9 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
+
+      <Header />
       <form
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm"

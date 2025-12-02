@@ -45,13 +45,13 @@ function App() {
 
       const uid = user.uid;
 
-      axios.get("http://localhost:5000/api/sleep", { params: { uid } })
+      axios.get("https://proj-lmfu.onrender.com/api/sleep", { params: { uid } })
         .then(res => setSleepData(res.data));
 
-      axios.get("http://localhost:5000/api/mood", { params: { uid } })
+      axios.get("https://proj-lmfu.onrender.com/api/mood", { params: { uid } })
         .then(res => setMoodData(res.data));
 
-      axios.get("http://localhost:5000/api/activity/logs", { params: { uid } })
+      axios.get("https://proj-lmfu.onrender.com/api/activity/logs", { params: { uid } })
         .then(res => setActivityData(res.data));
     });
 

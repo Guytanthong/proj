@@ -38,7 +38,7 @@ function SleepTracker() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/sleep", {
+      await axios.post("https://proj-lmfu.onrender.com/api/sleep", {
         uid,
         date,
         sleepTime: sleepString,

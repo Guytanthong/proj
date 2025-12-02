@@ -24,7 +24,7 @@ export default function ActInput() {
   // Load activity templates
   useEffect(() => {
     async function load() {
-      const res = await axios.get("http://localhost:5000/api/activity/all", {params: { uid: getUID() }});
+      const res = await axios.get("https://proj-lmfu.onrender.com/api/activity/all", {params: { uid: getUID() }});
       setActivities(res.data);
     }
     load();
@@ -48,7 +48,7 @@ export default function ActInput() {
 
     // Save mood
     if (mood) {
-      await axios.post("http://localhost:5000/api/mood", {
+      await axios.post("https://proj-lmfu.onrender.com/api/mood", {
         uid,
         date,
         mood,
@@ -57,7 +57,7 @@ export default function ActInput() {
 
     // Log activity using template
     if (selectedActivity) {
-      await axios.post("http://localhost:5000/api/activity/log", {
+      await axios.post("https://proj-lmfu.onrender.com/api/activity/log", {
         uid,
         date,
         activityId: selectedActivity
@@ -83,7 +83,7 @@ export default function ActInput() {
     const end24 = to24h(endTime);
 
     // 1. Log daily activity (ALWAYS)
-    await axios.post("http://localhost:5000/api/activity/log", {
+    await axios.post("https://proj-lmfu.onrender.com/api/activity/log", {
       uid,
       date,
       title: newTitle,
@@ -94,7 +94,7 @@ export default function ActInput() {
 
     // 2. Save as routine ONLY IF CHECKED
     if (saveAsRoutine) {
-      await axios.post("http://localhost:5000/api/activity/create", {
+      await axios.post("https://proj-lmfu.onrender.com/api/activity/create", {
         uid,
         title: newTitle,
         start: start24,
@@ -113,7 +113,7 @@ export default function ActInput() {
     setSaveAsRoutine(false);
 
     // Reload routines
-    const res = await axios.get("http://localhost:5000/api/activity/all", {
+    const res = await axios.get("https://proj-lmfu.onrender.com/api/activity/all", {
       params: { uid }
     });
     setActivities(res.data);

@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { auth } from "../firebase";
 
-
-
-
-
-
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer
+} from "recharts";
 
 export default function KeyInformation() {
 
@@ -46,7 +50,7 @@ export default function KeyInformation() {
         <p className="text-lg text-red-400">No analytics available</p>
         </div>
     );
-
+console.log("Sleep history:", analytics.sleep.history);
   return (
     <div className="min-h-screen bg-gray-950 pt-20 text-white">
       <div className="max-w-6xl mx-auto px-6">
@@ -103,9 +107,30 @@ export default function KeyInformation() {
 
         {/* SLEEP + MOOD SECTION */}
         <div className="grid grid-cols-2 gap-8 mb-10">
-          <PlaceholderPanel title="Sleep Trend Chart" />
-          <PlaceholderPanel title="Mood Trend Chart" />
-        </div>
+
+            <div className="bg-gray-900 rounded-xl p-6 border border-gray-700">
+                <h2 className="text-xl font-semibold mb-3">
+                Sleep Trend (Last 30 Days)
+                </h2>
+
+                <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={analytics.sleep.history}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="date" stroke="#9ca3af" />
+                    <YAxis stroke="#9ca3af" />
+                    <Tooltip />
+                    <Line
+                    type="monotone"
+                    dataKey="hours"
+                    stroke="#4ade80"
+                    strokeWidth={3}
+                    />
+                </LineChart>
+                </ResponsiveContainer>
+            </div>
+
+            <PlaceholderPanel title="Mood Trend Chart" />
+            </div>
 
         {/* ACTIVITY SECTION */}
         <div className="grid grid-cols-2 gap-8 mb-10">

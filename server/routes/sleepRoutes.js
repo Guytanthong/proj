@@ -7,44 +7,43 @@ const Sleep = require("../models/Sleep");
 //
 router.post("/", async (req, res) => {
   try {
-    const { uid, date, sleepTime, wakeTime, mood } = req.body;
+    const { uid, date, mood } = req.body;
 
-    if (!uid) return res.status(400).json({ error: "Missing UID" });
-    if (!date) return res.status(400).json({ error: "Missing date" });
+    if (!uid) return res.status(400).json({ message: "Missing UID" });
+    if (!date || !mood) return res.status(400).json({ message: "Missing fields" });
 
-    // Find this user's entry for THAT date
-    let existing = await Sleep.findOne({ uid, date });
+    // 🔥 Normalize date (VERY IMPORTANT)
+    const normalizedDate = new Date(date);
+    normalizedDate.setHours(0,0,0,0);
+
+    // 🔍 Check if mood already exists for that day
+    let existing = await Mood.findOne({ uid, date: normalizedDate });
 
     if (existing) {
-      existing.sleepTime = sleepTime;
-      existing.wakeTime = wakeTime;
       existing.mood = mood;
       await existing.save();
 
       return res.json({
-        message: "Updated existing sleep entry",
+        message: "Updated existing mood entry",
         updated: existing
       });
     }
 
-    // Create new entry
-    const newEntry = new Sleep({
+    // 🆕 Create new entry
+    const entry = new Mood({
       uid,
-      date,
-      sleepTime,
-      wakeTime,
+      date: normalizedDate,
       mood
     });
 
-    await newEntry.save();
-
-    return res.json({
-      message: "Created new sleep entry",
-      created: newEntry
+    await entry.save();
+    res.status(201).json({
+      message: "Created new mood entry",
+      created: entry
     });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    res.status(400).json({ message: err.message });
   }
 });
 

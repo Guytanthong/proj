@@ -6,5 +6,5 @@ const moodSchema = new mongoose.Schema({
   mood: { type: String, enum: ["GOOD", "MEH", "BAD"], required: true },
   createdAt: { type: Date, default: Date.now }
 });
-
+moodSchema.index({ uid: 1, date: 1 }, { unique: true });
 module.exports = mongoose.model("Mood", moodSchema);

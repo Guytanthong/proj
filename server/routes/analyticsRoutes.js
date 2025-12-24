@@ -7,6 +7,21 @@ const ActivityLog = require("../models/ActivityLog");
 
 
 // =============================
+//  SAFE DURATION CALCULATOR
+// =============================
+function calcDuration(s) {
+  if (s.durationHours) return Number(s.durationHours);
+
+  if (!s.sleepTime || !s.wakeTime) return 0;
+
+  const sleep = new Date(`2000-01-01T${s.sleepTime}`);
+  const wake = new Date(`2000-01-02T${s.wakeTime}`);
+
+  return Number(((wake - sleep) / (1000 * 60 * 60)).toFixed(1));
+}
+
+
+// =============================
 //  MAIN ANALYTICS ENDPOINT
 // =============================
 router.get("/", async (req, res) => {
@@ -16,31 +31,52 @@ router.get("/", async (req, res) => {
 
     const response = {};
 
-    // ---------- SLEEP ----------
+    // ==================================================
+    // ******************** SLEEP ***********************
+    // ==================================================
     const sleeps = await Sleep.find({ uid }).sort({ date: 1 });
 
     if (sleeps.length > 0) {
+
+      // ---- Average + Consistency ----
       let total = 0;
       let deviations = [];
 
-      sleeps.forEach(s => total += s.durationHours);
-
+      sleeps.forEach(s => total += calcDuration(s));
       const avgSleep = total / sleeps.length;
-
-      // Consistency (standard deviation-ish)
       const mean = avgSleep;
-      sleeps.forEach(s => deviations.push(Math.abs(s.durationHours - mean)));
 
-      const consistency = 100 - (deviations.reduce((a,b)=>a+b,0) / sleeps.length * 10);
-      
+      sleeps.forEach(s => deviations.push(Math.abs(calcDuration(s) - mean)));
+
+      const consistency =
+        100 - (deviations.reduce((a, b) => a + b, 0) / sleeps.length * 10);
+
+
+      // ---- Last 30 Day Sleep History ----
+      const last30 = sleeps.slice(-30);
+
+      const history = last30.map(s => ({
+        date: new Date(s.date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric"
+        }),
+        hours: calcDuration(s)
+      }));
+
+
       response.sleep = {
         avgHours: Number(avgSleep.toFixed(2)),
         consistency: Math.max(0, Math.min(100, Number(consistency.toFixed(1)))),
-        daysTracked: sleeps.length
+        daysTracked: sleeps.length,
+        history
       };
     }
 
-    // ---------- MOOD ----------
+
+
+    // ==================================================
+    // ******************** MOOD ************************
+    // ==================================================
     const moods = await Mood.find({ uid });
 
     if (moods.length > 0) {
@@ -54,7 +90,11 @@ router.get("/", async (req, res) => {
       };
     }
 
-    // ---------- ACTIVITY ----------
+
+
+    // ==================================================
+    // ***************** ACTIVITY ***********************
+    // ==================================================
     const logs = await ActivityLog.find({ uid });
 
     if (logs.length > 0) {
@@ -80,6 +120,10 @@ router.get("/", async (req, res) => {
       };
     }
 
+
+    // ================================
+    // RETURN RESPONSE
+    // ================================
     res.json(response);
 
   } catch (err) {

@@ -9,4 +9,6 @@ const sleepSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+sleepSchema.index({ uid: 1, date: 1 }, { unique: true });
+
 module.exports = mongoose.model('Sleep', sleepSchema);

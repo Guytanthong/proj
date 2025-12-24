@@ -174,7 +174,7 @@ export default function Home() {
 
           {/* FOOTER */}
           <footer className="py-6 text-gray-300 text-center">
-            © 2025 urLife — Built by Tanthong ⚡
+            © 2025 urLife — Built by Tanthong 
           </footer>
 
         </div>

@@ -8,11 +8,12 @@ import ActivityGraph from "./components/ActivityGraph";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import KeyInformation from "./pages/KeyInformation";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
-
+import { Link } from "react-router-dom";
 
 
 
@@ -141,6 +142,7 @@ function App() {
     <Route path="/" element={<Home />} />
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<Signup />} />
+    
 
     {/* MAIN DASHBOARD */}
     <Route
@@ -152,9 +154,19 @@ function App() {
             <Header />
 
             <div className="max-w-[1500px] ml-10 flex gap-10 p-10">
+
               <div className="w-[360px] flex flex-col gap-8 ">
                 <SleepTracker />
                 <ActInput />
+
+
+                <Link
+                  to="/key-info"
+                  className="px-4 py-2 text-center rounded-xl bg-indigo-500 hover:bg-indigo-600 
+                            text-white font-semibold shadow-lg"
+                >
+                  View Key Information
+                </Link>
               </div>
 
               <div className="flex-1 flex flex-col gap-5">
@@ -209,6 +221,15 @@ function App() {
             </div>
 
           </div>
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/key-info"
+      element={
+        <ProtectedRoute>
+          <KeyInformation />
         </ProtectedRoute>
       }
     />

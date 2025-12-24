@@ -7,6 +7,8 @@ import { logout } from "../authService";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 
+
+
 export default function Home() {
 
   const navigate = useNavigate();
@@ -50,30 +52,38 @@ export default function Home() {
         <div className="mt-32 px-6 max-w-6xl mx-auto relative">
 
           {/* LEFT FLOATING FEATURE CARDS */}
-          <div className="hidden md:flex flex-col gap-10 absolute left-0 -ml-[250px] top-1/2 -translate-y-1/2 z-20">
+          <div className="hidden md:flex flex-col gap-10 absolute left-0 -ml-[700px] top-1/2 -translate-y-1/2 z-20">
 
             {/* Card 1 */}
-            <div className="group relative w-80 p-6 rounded-2xl bg-white/10 backdrop-blur-xl 
-                            border border-white/20 shadow-xl transition-all duration-300 
-                            hover:shadow-2xl hover:scale-[1.03] hover:bg-white/15">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br 
-                              from-blue-500/20 via-purple-500/20 to-pink-500/20 
-                              opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-              <img src="/icons/sleep.png" alt="" className="w-12 h-12 mb-4 opacity-90" />
-              <h3 className="text-2xl font-semibold mb-2">Track Sleep</h3>
-              <p className="text-gray-200 text-sm leading-relaxed">
-                Understand your nights with premium insights and restful visual analytics.
-              </p>
-            </div>
+            <div className="group relative w-fit h-[350px] p-6 rounded-2xl bg-white/10 backdrop-blur-xl 
+              border border-white/20 shadow-xl transition-all duration-300 
+              hover:shadow-2xl hover:scale-[1.03] hover:bg-white/15">
+                <div className="group relative w-[700px] h-[500px] p-6 flex flex-col">
+              
+                        <img
+                          src="/icons/sleepg.png"
+                          alt=""
+                          className="w-full max-h-[260px] object-contain mb-6"
+                        />
+
+                        <h3 className="text-2xl font-semibold">Track Sleep</h3>
+
+                        <p className="text-gray-200 text-sm leading-relaxed">
+                          Understand your nights with premium insights and restful visual analytics.
+                        </p>
+
+              </div>
+           
+          </div>
 
             {/* Card 2 */}
-            <div className="group relative w-80 p-6 rounded-2xl bg-white/10 backdrop-blur-xl 
-                            border border-white/20 shadow-xl transition-all duration-300 
-                            hover:shadow-2xl hover:scale-[1.03] hover:bg-white/15">
+           <div className="group relative w-[750px] h-[400px] p-6 rounded-2xl bg-white/10 backdrop-blur-xl 
+              border border-white/20 shadow-xl transition-all duration-300 
+              hover:shadow-2xl hover:scale-[1.03] hover:bg-white/15">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br 
                               from-blue-500/20 via-purple-500/20 to-pink-500/20 
                               opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-              <img src="/icons/sleep.png" alt="" className="w-12 h-12 mb-4 opacity-90" />
+              <img src="/icons/actg.png" alt="" className="w-full max-h-[260px] mb-6 opacity-90" />
               <h3 className="text-2xl font-semibold mb-2">Log Activities</h3>
               <p className="text-gray-200 text-sm leading-relaxed">
                 Build healthy routines with seamless activity tracking.
@@ -81,13 +91,14 @@ export default function Home() {
             </div>
 
             {/* Card 3 */}
-            <div className="group relative w-80 p-6 rounded-2xl bg-white/10 backdrop-blur-xl 
-                            border border-white/20 shadow-xl transition-all duration-300 
-                            hover:shadow-2xl hover:scale-[1.03] hover:bg-white/15">
+            
+            <div className="group relative w-fit h-[350px] p-6 rounded-2xl bg-white/10 backdrop-blur-xl 
+              border border-white/20 shadow-xl transition-all duration-300 
+              hover:shadow-2xl hover:scale-[1.03] hover:bg-white/15">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br 
                               from-blue-500/20 via-purple-500/20 to-pink-500/20 
                               opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-              <img src="/icons/sleep.png" alt="" className="w-12 h-12 mb-4 opacity-90" />
+              <img src="/icons/mood.png" alt="" className="w-full max-h-[260px] mb-6 opacity-90" />
               <h3 className="text-2xl font-semibold mb-2">Monitor Mood</h3>
               <p className="text-gray-200 text-sm leading-relaxed">
                 Reflect on your emotional balance over time.

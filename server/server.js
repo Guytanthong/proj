@@ -2,6 +2,8 @@
 const sleepRoutes = require("./routes/sleepRoutes");
 const moodRoutes = require("./routes/moodRoutes");
 const activityRoutes = require("./routes/activityRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
+
 
 const express = require('express');
 const cors = require('cors');
@@ -11,6 +13,7 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
@@ -27,6 +30,7 @@ app.get('/', (req, res) => {
 app.use("/api/sleep", sleepRoutes);
 app.use("/api/mood", moodRoutes);
 app.use("/api/activity", activityRoutes);
+app.use("/api/analytics",analyticsRoutes);
 
 const PORT = process.env.PORT || 5000;
 

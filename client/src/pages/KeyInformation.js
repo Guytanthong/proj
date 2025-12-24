@@ -1,4 +1,52 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { auth } from "../firebase";
+
+
+
+
+
+
+
 export default function KeyInformation() {
+
+    const [analytics, setAnalytics] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+
+        const user = auth.currentUser;
+        if (!user) return;
+
+        axios.get("http://localhost:5000/api/analytics", {
+        params: { uid: user.uid }
+        })
+        .then(res => {
+        setAnalytics(res.data);
+        setLoading(false);
+        })
+        .catch(err => {
+        console.error(err);
+        setLoading(false);
+        });
+
+    }, []);
+
+
+    if (loading)
+        return (
+            <div className="min-h-screen bg-gray-950 pt-20 text-white flex items-center justify-center">
+            <p className="text-lg text-gray-400">Loading insights...</p>
+            </div>
+        );
+
+    if (!analytics)
+    return (
+        <div className="min-h-screen bg-gray-950 pt-20 text-white flex items-center justify-center">
+        <p className="text-lg text-red-400">No analytics available</p>
+        </div>
+    );
+
   return (
     <div className="min-h-screen bg-gray-950 pt-20 text-white">
       <div className="max-w-6xl mx-auto px-6">
@@ -24,10 +72,33 @@ export default function KeyInformation() {
 
         {/* SUMMARY CARDS */}
         <div className="grid grid-cols-4 gap-5 mb-10">
-          <SummaryCard label="Avg Sleep" value="7.2 hrs" trend="+0.4" />
-          <SummaryCard label="Sleep Consistency" value="82%" trend="+6%" />
-          <SummaryCard label="Average Mood" value="😊 Good" trend="Stable" />
-          <SummaryCard label="Productive Time" value="62%" trend="+9%" />
+          <SummaryCard 
+            label="Avg Sleep" 
+            value={(analytics?.sleep?.avgHours || 0) + " hrs"} 
+            trend={`${analytics?.sleep?.daysTracked || 0} days tracked`} 
+            />
+
+            <SummaryCard 
+                label="Sleep Consistency" 
+                value={(analytics?.sleep?.consistency || 0) + "%"} 
+                trend="Compared to your history" 
+                />
+
+            <SummaryCard 
+                label="Average Mood" 
+                value={
+                    analytics?.mood
+                    ? `${analytics.mood.breakdown.GOOD || 0} good days`
+                    : "No data"
+                }
+                trend={`${analytics?.mood?.total || 0} total logs`} 
+                />
+
+            <SummaryCard 
+                label="Productive Time" 
+                value={(analytics?.activity?.productivePercent || 0) + "%"} 
+                trend={`Relax: ${analytics?.activity?.relaxPercent || 0}%`} 
+                />
         </div>
 
         {/* SLEEP + MOOD SECTION */}

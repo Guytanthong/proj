@@ -7,41 +7,21 @@ const Sleep = require("../models/Sleep");
 //
 router.post("/", async (req, res) => {
   try {
-    const { uid, date, mood } = req.body;
+    const { uid, date } = req.body;
 
     if (!uid) return res.status(400).json({ message: "Missing UID" });
-    if (!date || !mood) return res.status(400).json({ message: "Missing fields" });
+    if (!date) return res.status(400).json({ message: "Missing date" });
 
-    // 🔥 Normalize date (VERY IMPORTANT)
+    //Normalize date (VERY IMPORTANT)
     const normalizedDate = new Date(date);
     normalizedDate.setHours(0,0,0,0);
 
-    // 🔍 Check if mood already exists for that day
-    let existing = await Mood.findOne({ uid, date: normalizedDate });
-
-    if (existing) {
-      existing.mood = mood;
-      await existing.save();
-
-      return res.json({
-        message: "Updated existing mood entry",
-        updated: existing
-      });
-    }
-
-    // 🆕 Create new entry
-    const entry = new Mood({
+    res.status(200).json({
+      message: "Sleep entry validated",
       uid,
-      date: normalizedDate,
-      mood
+      date: normalizedDate
     });
-
-    await entry.save();
-    res.status(201).json({
-      message: "Created new mood entry",
-      created: entry
-    });
-
+    
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

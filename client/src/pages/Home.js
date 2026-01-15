@@ -13,7 +13,7 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  // 🔥 Reactively track user login state
+  // Reactively track user login state
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {

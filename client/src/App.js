@@ -160,13 +160,13 @@ function App() {
                 <ActInput />
 
 
-                <Link
+                {/* <Link
                   to="/key-info"
                   className="px-4 py-2 text-center rounded-xl bg-indigo-500 hover:bg-indigo-600 
                             text-white font-semibold shadow-lg"
                 >
                   View Key Information
-                </Link>
+                </Link> */}
               </div>
 
               <div className="flex-1 flex flex-col gap-5">

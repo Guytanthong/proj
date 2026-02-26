@@ -149,7 +149,7 @@ function App() {
       path="/dashboard"
       element={
       <ProtectedRoute>
-          <div className="min-h-screen bg-gray-950 bg-center bg-fixed pt-20">
+          <div style={{ zoom: "0.7" }} className="min-h-screen bg-gray-950 bg-center bg-fixed pt-20">
 
             <Header />
 

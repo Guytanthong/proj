@@ -30,7 +30,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative w-full min-h-screen overflow-x-hidden">
+    <div style={{ zoom: "0.67" }} className="relative w-full min-h-screen ">
 
       {/* FULL-PAGE FIXED BACKGROUND */}
       <div
@@ -63,12 +63,12 @@ export default function Home() {
                         <img
                           src="/icons/sleepg.png"
                           alt=""
-                          className="w-full max-h-[260px] object-contain mb-6"
+                          className="w-full max-h-[260px] object-contain mb-6 rounded-xl"
                         />
 
                         <h3 className="text-2xl font-semibold">Track Sleep</h3>
 
-                        <p className="text-gray-200 text-sm leading-relaxed">
+                        <p className="text-gray-200 text-xl leading-relaxed">
                           Understand your nights with premium insights and restful visual analytics.
                         </p>
 
@@ -83,9 +83,9 @@ export default function Home() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br 
                               from-blue-500/20 via-purple-500/20 to-pink-500/20 
                               opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-              <img src="/icons/actg.png" alt="" className="w-full max-h-[260px] mb-6 opacity-90" />
+              <img src="/icons/actg.png" alt="" className="w-full max-h-[260px] mb-6 opacity-90 rounded-xl" />
               <h3 className="text-2xl font-semibold mb-2">Log Activities</h3>
-              <p className="text-gray-200 text-sm leading-relaxed">
+              <p className="text-gray-200 text-xl leading-relaxed">
                 Build healthy routines with seamless activity tracking.
               </p>
             </div>
@@ -98,9 +98,9 @@ export default function Home() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br 
                               from-blue-500/20 via-purple-500/20 to-pink-500/20 
                               opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500"></div>
-              <img src="/icons/mood.png" alt="" className="w-full max-h-[260px] mb-6 opacity-90" />
+              <img src="/icons/mood.png" alt="" className="w-full max-h-[208px] mb-6 opacity-90 rounded-xl" />
               <h3 className="text-2xl font-semibold mb-2">Monitor Mood</h3>
-              <p className="text-gray-200 text-sm leading-relaxed">
+              <p className="text-gray-200 text-xl leading-relaxed">
                 Reflect on your emotional balance over time.
               </p>
             </div>
@@ -135,8 +135,8 @@ export default function Home() {
               className="mx-auto w-90 h-90 mt-6"
             />
 
-            <p className="text-gray-200 mt-4 max-w-md">
-              Track your sleep, mood, and daily activities effortlessly.
+            <p className="text-gray-200 mt-4  text-xl">
+              Track your sleep, mood, and daily activities effortlessly. <br/>
               Built for clarity, focus, and self-improvement.
             </p>
 

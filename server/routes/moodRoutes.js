@@ -12,12 +12,9 @@ router.post("/", async (req, res) => {
     if (!uid) return res.status(400).json({ message: "Missing UID" });
     if (!date || !mood) return res.status(400).json({ message: "Missing fields" });
 
-    // 🔥 Normalize date (VERY IMPORTANT)
-    const normalizedDate = new Date(date);
-    normalizedDate.setHours(0,0,0,0);
+    // date is already YYYY-MM-DD string → DO NOT convert
 
-    // 🔍 Check if mood already exists for that day
-    let existing = await Mood.findOne({ uid, date: normalizedDate });
+    let existing = await Mood.findOne({ uid, date });
 
     if (existing) {
       existing.mood = mood;
@@ -29,24 +26,19 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // 🆕 Create new entry
-    const entry = new Mood({
-      uid,
-      date: normalizedDate,
-      mood
-    });
-
+    const entry = new Mood({ uid, date, mood });
     await entry.save();
+
     res.status(201).json({
       message: "Created new mood entry",
       created: entry
     });
 
   } catch (err) {
+    console.log(err); // ⭐ keep this for debugging
     res.status(400).json({ message: err.message });
   }
 });
-
 //
 // GET moods for THIS USER only
 //

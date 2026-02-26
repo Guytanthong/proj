@@ -38,35 +38,44 @@ export default function ActInput() {
   /* 
      HANDLE SAVE (MOOD + ACTIVITY LOGGING)
   */
-  async function handleSave() {
-    if (!date) return alert("Please choose a date!");
-    if (!mood && !selectedActivity)
-      return alert("Select at least MOOD or ACTIVITY.");
+ async function handleSave() {
+  if (!date) return alert("Please choose a date!");
+  if (!mood && !selectedActivity)
+    return alert("Select at least MOOD or ACTIVITY.");
 
-    const uid = getUID();
-    if (!uid) return alert("You must be logged in!");
+  const uid = getUID();
+  if (!uid) return alert("You must be logged in!");
 
-    // Save mood
+  try {
+    // ---- SAVE MOOD ----
     if (mood) {
-      await axios.post("https://proj-lmfu.onrender.com/api/mood", {
-        uid,
-        date,
-        mood,
-      });
+      console.log("SENDING MOOD:", { uid, date, mood });
+
+      const res = await axios.post(
+        "https://proj-lmfu.onrender.com/api/mood",
+        { uid, date, mood }
+      );
+
+      console.log("MOOD SUCCESS:", res.data);
     }
 
-    // Log activity using template
+    // ---- SAVE ACTIVITY ----
     if (selectedActivity) {
-      await axios.post("https://proj-lmfu.onrender.com/api/activity/log", {
-        uid,
-        date,
-        activityId: selectedActivity
-      });
+      const res2 = await axios.post(
+        "https://proj-lmfu.onrender.com/api/activity/log",
+        { uid, date, activityId: selectedActivity }
+      );
+
+      console.log("ACTIVITY SUCCESS:", res2.data);
     }
 
     alert("Saved!");
-  }
 
+  } catch (err) {
+    console.log("SERVER RESPONSE:", err.response?.data);
+    alert(err.response?.data?.message || "Server error");
+  }
+}
 
   /*
      SAVE NEW TEMPLATE ACTIVITY

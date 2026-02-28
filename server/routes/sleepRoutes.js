@@ -8,7 +8,7 @@ const Sleep = require("../models/Sleep");
 router.post("/", async (req, res) => {
   try {
     console.log("BODY RECEIVED:", req.body);
-    const { uid, date } = req.body;
+    const { uid, date, sleepTime, wakeTime } = req.body;
 
     if (!uid) return res.status(400).json({ message: "Missing UID" });
     if (!date) return res.status(400).json({ message: "Missing date" });
@@ -16,12 +16,14 @@ router.post("/", async (req, res) => {
     //Normalize date (VERY IMPORTANT)
     const normalizedDate = new Date(date);
     normalizedDate.setHours(0,0,0,0);
+
+    const sleep = await Sleep.findOneAndUpdate(
+      { uid, date: normalizedDate },
+      { uid, date: normalizedDate, sleepTime, wakeTime },
+      { upsert: true, new: true }
+    );
     
-    res.status(200).json({
-      message: "Sleep entry validated",
-      uid,
-      date: normalizedDate
-    });
+    res.status(200).json(sleep);
     
   } catch (err) {
     res.status(400).json({ message: err.message });

@@ -156,8 +156,8 @@ function App() {
             <div className="max-w-[1500px] ml-10 flex gap-10 p-10">
 
               <div className="w-[360px] flex flex-col gap-8 ">
-                <SleepTracker />
-                <ActInput />
+                <SleepTracker onSave={(newEntry) => setSleepData(prev => [...prev, newEntry])} />
+                <ActInput onMoodSave={(newEntry) => setMoodData(prev => [...prev, newEntry])} />
 
 
                 {/* <Link

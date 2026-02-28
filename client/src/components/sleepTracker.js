@@ -2,10 +2,11 @@ import { useState } from "react";
 import axios from "axios";
 import { auth } from "../firebase";
 
-function SleepTracker() {
+function SleepTracker({ onSave }) {
+  
   const [date, setDate] = useState("");
-  const [sleepTime, setSleepTime] = useState("");   // now a string "HH:mm"
-  const [wakeTime, setWakeTime] = useState("");     // string "HH:mm"
+  const [sleepTime, setSleepTime] = useState("");   
+  const [wakeTime, setWakeTime] = useState("");     
 
   function getUID() {
     return auth.currentUser?.uid || null;
@@ -29,14 +30,6 @@ function SleepTracker() {
     const sleepString = formatTime(sleepTime);
     const wakeString = formatTime(wakeTime);
 
-    const sleepDateTime = new Date(`${date}T${sleepString}`);
-    let wakeDateTime = new Date(`${date}T${wakeString}`);
-
-    // If waking is earlier → next day
-    if (wakeDateTime < sleepDateTime) {
-      wakeDateTime.setDate(wakeDateTime.getDate() + 1);
-    }
-
     try {
       await axios.post("https://proj-lmfu.onrender.com/api/sleep", {
         uid,
@@ -44,13 +37,19 @@ function SleepTracker() {
         sleepTime: sleepString,
         wakeTime: wakeString
       });
+      console.log("API save success"); // ✅ check if this appears
 
+      // ✅ instantly update graph
+      onSave({ date, sleepTime: sleepString, wakeTime: wakeString });
+      console.log("onSave called"); 
       alert("Sleep data saved!");
     } catch (error) {
       console.error("Error saving sleep data:", error);
       alert("Failed to save sleep data");
     }
   };
+
+  
 
   return (
     <div className= "card card-sleep">

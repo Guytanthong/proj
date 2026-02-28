@@ -96,4 +96,27 @@ select option {
 }
 
 
+/* Active mood (selected) - keep existing */
+.mood-btn.active {
+  border: 1px solid white;
+  background: rgba(255, 255, 255, 0.25);
+}
 
+/* Fill the ripple layer when active */
+.mood-btn.good.active .transition {
+  width: 250px;
+  height: 250px;
+  background-color: var(--mood-good);
+}
+
+.mood-btn.meh.active .transition {
+  width: 250px;
+  height: 250px;
+  background-color: var(--mood-meh);
+}
+
+.mood-btn.bad.active .transition {
+  width: 250px;
+  height: 250px;
+  background-color: var(--mood-bad);
+}

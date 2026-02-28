@@ -3,7 +3,7 @@ import axios from "axios";
 import TimeInput24 from "./TimeInput24";
 import { auth } from "../firebase";
 
-export default function ActInput() {
+export default function ActInput({ onMoodSave }) {
   const [date, setDate] = useState("");
   const [mood, setMood] = useState("");
   const [newColor, setNewColor] = useState("#3b82f6");
@@ -55,7 +55,7 @@ export default function ActInput() {
         "https://proj-lmfu.onrender.com/api/mood",
         { uid, date, mood }
       );
-
+      onMoodSave({ date, mood });
       console.log("MOOD SUCCESS:", res.data);
     }
 
@@ -159,9 +159,7 @@ export default function ActInput() {
             >
               <span className="transition"></span>
               <span className="label">
-                {m === "GOOD" && "GOOD"}
-                {m === "MEH" && "MEH"}
-                {m === "BAD" && "BAD"}
+                {m}
               </span>
             </button>
           ))}

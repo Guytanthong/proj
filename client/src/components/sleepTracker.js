@@ -55,7 +55,7 @@ function SleepTracker({ onSave }) {
     <div className= "card card-sleep">
 
       <h2 className="text-2xl font-bold mb-4">
-        Add your SLEEP <span className="text-sm opacity-80">when u wake</span>
+        Add ur SLEEP <span className="text-sm opacity-80">when u wake</span>
       </h2>
 
       {/* DATE */}

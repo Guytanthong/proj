@@ -39,40 +39,52 @@ function moodColor(mood) {
   return "#9ca3af";
 }
 
+  // convert sharedRange timestamps to ISO strings
+const toISO = (ts) => {
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+  
+
 export default function SleepGraph({ sleepData, moodData, sharedRange }) {
   const chartRef = useRef(null);
 
   // Mood 1-day shift map
   const moodMap = {};
-  moodData.forEach((m) => {
-    const d = new Date(m.date);
-    d.setDate(d.getDate() - 1);
-    moodMap[d.toISOString().split("T")[0]] = m.mood;
-  });
+    moodData.forEach((m) => {
+  const iso = m.date.split("T")[0];
+  const [year, month, day] = iso.split("-").map(Number);
+  const d = new Date(year, month - 1, day);
+  d.setDate(d.getDate() - 1);
+  const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  moodMap[key] = m.mood;
+});
+    
 
   // Format sleep data
   const formatted = sleepData.map((entry) => {
-    const iso = entry.date.split("T")[0];
+  const iso = entry.date.split("T")[0];
 
-    const tsDate = new Date(iso);
-    tsDate.setHours(0, 0, 0, 0);
-    const ts = tsDate.getTime();
+  const [year, month, day] = iso.split("-").map(Number);
+  const ts = new Date(year, month - 1, day).getTime();
+    
+    
+  // console.log("bar date:", iso, "ts:", new Date(ts).toString());
+  let start = toHour(entry.sleepTime);
+  let end = toHour(entry.wakeTime);
 
-    let start = toHour(entry.sleepTime);
-    let end = toHour(entry.wakeTime);
+  if (end < start) end += 24;
+  if (start < 15) start += 24;
+  if (end < 15) end += 24;
 
-    if (end < start) end += 24;
-    if (start < 15) start += 24;
-    if (end < 15) end += 24;
-
-    return {
-      iso,
-      ts,
-      startHour: start,
-      endHour: end,
-      mood: moodMap[iso] || "NONE"
-    };
-  });
+  return {
+    iso,
+    ts,
+    startHour: start,
+    endHour: end,
+    mood: moodMap[iso] || "NONE"
+  };
+});
 
   const data = {
     datasets: [
@@ -95,6 +107,12 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
     responsive: true,
     maintainAspectRatio: false,
 
+    interaction: {
+      mode: "index",
+      axis: "x",
+      intersect: false,
+    },
+
     layout: {
       padding: 20,
     },
@@ -104,12 +122,20 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
         type: "time",
         time: {
           unit: "day",
+          round: "day",
           tooltipFormat: "dd MMM yyyy",
+          displayFormats: {
+            day: "dd MMM"
+          }
+
         },
         min: sharedRange?.min,
         max: sharedRange?.max,
         offset: true,
 
+        adapters: {
+          date: {}
+        },
         grid: {
           color: "rgba(255,255,255,0.06)",
           lineWidth: 1,
@@ -176,12 +202,11 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
 
         callbacks: {
           title: (ctx) => {
-            const ts = ctx[0].raw.x;
-            return new Date(ts).toLocaleDateString("en-US", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            });
+            const index = ctx[0].dataIndex;
+            const iso = formatted[index].iso;
+            const [year, month, day] = iso.split("-").map(Number);
+            const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            return `${String(day).padStart(2, "0")} ${monthNames[month - 1]} ${year}`;
           },
           label: (ctx) => {
             const [s, e] = ctx.raw.y;

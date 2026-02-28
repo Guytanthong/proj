@@ -34,7 +34,9 @@ function App() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
-  
+
+
+
  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) return;
@@ -149,7 +151,8 @@ function App() {
       path="/dashboard"
       element={
       <ProtectedRoute>
-          <div style={{ zoom: "0.7" }} className="min-h-screen bg-gray-950 bg-center bg-fixed pt-20">
+        <div style={{ overflow: "hidden" }}>
+          <div style={{ transform: "scale(0.7)", transformOrigin: "top left", width: "142.86%", minHeight: "142.86vh" }} className="min-h-screen bg-gray-950 bg-center bg-fixed pt-20">
 
             <Header />
 
@@ -207,7 +210,7 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="pt-12">
+                  <div className="pt-12 w-full">
                     <SleepGraph
                       sleepData={sleepData}
                       moodData={moodData}
@@ -221,6 +224,7 @@ function App() {
             </div>
 
           </div>
+        </div>
         </ProtectedRoute>
       }
     />

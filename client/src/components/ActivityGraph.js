@@ -28,6 +28,7 @@ ChartJS.register(
 ------------------------- */
 const barLabelPlugin = {
   id: "barLabelPlugin",
+
   afterDatasetsDraw(chart) {
     const ds = chart.data.datasets[0];
     if (!ds || !ds._formatted) return;
@@ -39,22 +40,39 @@ const barLabelPlugin = {
       const act = ds._formatted[index];
       if (!act) return;
 
-      const { x, y, base } = bar.getProps(["x", "y", "base"], true);
+      const { x, y, base, width } = bar.getProps(["x","y","base","width"], true);
 
       const top = Math.min(y, base);
       const bottom = Math.max(y, base);
       const centerY = (top + bottom) / 2;
+      const height = bottom - top;
+
+      // Skip tiny bars
+      if (height < 18) return;
 
       ctx.save();
+
+      // Dynamic font size
+      const fontSize = Math.min(14, height * 0.4);
+      ctx.font = `600 ${fontSize}px sans-serif`;
       ctx.fillStyle = "white";
-      ctx.font = "600 12px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+
+      // Prevent text overflow
+      const textWidth = ctx.measureText(act.title).width;
+      if (textWidth > width - 10) {
+        ctx.restore();
+        return;
+      }
+
       ctx.fillText(act.title, x, centerY);
+
       ctx.restore();
     });
   }
 };
+
 ChartJS.register(barLabelPlugin);
 
 

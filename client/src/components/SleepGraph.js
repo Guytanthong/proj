@@ -173,7 +173,7 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
         },
 
         ticks: {
-          stepSize: 3,
+          
           color: "#94a3b8",
           font: { size: 12 },
           callback: (v) => {
@@ -184,7 +184,7 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
 
         afterBuildTicks(scale) {
           const ticks = [];
-          for (let v = 15; v <= 42; v += 3) ticks.push({ value: v });
+          for (let v = 15; v <= 42; v += 2) ticks.push({ value: v });
           scale.ticks = ticks;
         },
       },
@@ -243,7 +243,7 @@ export default function SleepGraph({ sleepData, moodData, sharedRange }) {
   }, [sharedRange]);
 
   return (
-    <div className="w-full h-[480px] rounded-xl shadow-lg bg-[#0f172a]">
+    <div className="w-full h-[336px] rounded-xl shadow-lg bg-[#0f172a] pb-4">
       <Chart
         key={(sharedRange?.min || 0) + "-" + (sharedRange?.max || 0)}
         ref={chartRef}

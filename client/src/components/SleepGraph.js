@@ -39,11 +39,11 @@ function moodColor(mood) {
   return "#9ca3af";
 }
 
-  // convert sharedRange timestamps to ISO strings
-const toISO = (ts) => {
-  const d = new Date(ts);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-};
+//   // convert sharedRange timestamps to ISO strings
+// const toISO = (ts) => {
+//   const d = new Date(ts);
+//   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+// };
   
 
 export default function SleepGraph({ sleepData, moodData, sharedRange }) {
